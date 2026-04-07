@@ -1,3 +1,9 @@
+/* ============================================================
+   MORTYS WELT — styles.css
+   DSGVO-konform: Keine externen Ressourcen.
+   Inter wird lokal geladen (Variable Font).
+   ============================================================ */
+
 /* === FONTS === */
 @font-face {
     font-family: 'Inter';
@@ -18,22 +24,22 @@
 
 /* === DESIGN TOKENS === */
 :root {
-    --accent:           #9B6DFF;
-    --accent-soft:      rgba(155, 109, 255, 0.22);
-    --accent-glow:      rgba(155, 109, 255, 0.14);
-    --accent-hover:     rgba(155, 109, 255, 0.28);
-    --cyan:             #4FC3F7;
+    --accent:           #8c1c13;   /* Rotton */
+    --accent-warm:      #e7d7c1;   /* Gelbton */
+    --accent-soft:      rgba(140, 28, 19, 0.20);
+    --accent-glow:      rgba(140, 28, 19, 0.14);
+    --accent-hover:     rgba(140, 28, 19, 0.26);
 
     --card-bg:          rgba(7, 9, 22, 0.80);
-    --card-border:      rgba(155, 109, 255, 0.20);
-    --card-inner-bg:    rgba(155, 109, 255, 0.04);
+    --card-border:      rgba(140, 28, 19, 0.30);
+    --card-inner-bg:    rgba(140, 28, 19, 0.04);
 
     --text-primary:     #ffffff;
     --text-muted:       rgba(255, 255, 255, 0.52);
 
     --btn-bg:           rgba(255, 255, 255, 0.055);
     --btn-border:       rgba(255, 255, 255, 0.10);
-    --btn-hover-border: rgba(155, 109, 255, 0.55);
+    --btn-hover-border: rgba(140, 28, 19, 0.60);
 }
 
 /* === RESET === */
@@ -169,7 +175,7 @@ main {
     box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.04),
         0 28px 72px rgba(0, 0, 0, 0.72),
-        0 0 120px var(--accent-glow),
+        0 0 120px rgba(140, 28, 19, 0.14),
         inset 0 1px 0 rgba(255, 255, 255, 0.07);
     animation: cardEnter 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -210,7 +216,7 @@ main {
     transform: translateX(-50%);
     width: 180px;
     height: 180px;
-    background: radial-gradient(circle, rgba(155, 109, 255, 0.25) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(140, 28, 19, 0.22) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
 }
@@ -222,17 +228,11 @@ main {
     height: 136px;
     border-radius: 50%;
     padding: 3px;
-    background: conic-gradient(
-        from 0deg,
-        var(--accent),
-        var(--cyan) 33%,
-        var(--accent) 66%,
-        var(--cyan) 100%
-    );
+    background: #8c1c13;
     box-shadow:
         0 0 0 4px rgba(7, 9, 22, 0.9),
-        0 0 40px rgba(155, 109, 255, 0.50),
-        0 0 80px rgba(79, 195, 247, 0.15);
+        0 0 40px rgba(140, 28, 19, 0.55),
+        0 0 80px rgba(231, 215, 193, 0.10);
     animation: ringPulse 5s ease-in-out infinite;
     margin-bottom: 26px;
     flex-shrink: 0;
@@ -242,14 +242,14 @@ main {
     0%, 100% {
         box-shadow:
             0 0 0 4px rgba(7, 9, 22, 0.9),
-            0 0 30px rgba(155, 109, 255, 0.45),
-            0 0 70px rgba(79, 195, 247, 0.12);
+            0 0 30px rgba(140, 28, 19, 0.45),
+            0 0 70px rgba(231, 215, 193, 0.08);
     }
     50% {
         box-shadow:
             0 0 0 4px rgba(7, 9, 22, 0.9),
-            0 0 55px rgba(155, 109, 255, 0.65),
-            0 0 110px rgba(79, 195, 247, 0.22);
+            0 0 55px rgba(140, 28, 19, 0.65),
+            0 0 110px rgba(231, 215, 193, 0.15);
     }
 }
 
@@ -269,10 +269,8 @@ main {
     letter-spacing: -0.055em;
     line-height: 0.87;
     margin-bottom: 18px;
-    background: linear-gradient(145deg, #ffffff 55%, var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #e7d7c1;
+    padding: 0 4px;
     animation: nameIn 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -298,9 +296,9 @@ main {
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.04em;
-    color: var(--accent);
-    background: var(--accent-soft);
-    border: 1px solid rgba(155, 109, 255, 0.35);
+    color: #e7d7c1;
+    background: rgba(140, 28, 19, 0.22);
+    border: 1px solid rgba(140, 28, 19, 0.50);
     border-radius: 999px;
     padding: 5px 16px;
     animation: nameIn 0.8s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -345,7 +343,7 @@ main {
     background: var(--btn-bg);
     border: 1px solid var(--btn-border);
     border-radius: 12px;
-    color: var(--text-primary);
+    color: #e7d7c1;   /* war: var(--text-primary) */
     text-decoration: none;
     font-size: 0.875rem;
     font-weight: 600;
@@ -394,9 +392,9 @@ main {
 
 /* Plattform-spezifische Hover-Farben */
 .link-btn[data-platform="twitch"]:hover {
-    background: rgba(145, 70, 255, 0.22);
-    border-color: rgba(145, 70, 255, 0.55);
-    box-shadow: 0 0 24px rgba(145, 70, 255, 0.30), inset 0 1px 0 rgba(255,255,255,0.08);
+    background: rgba(145, 70, 255, 0.18);
+    border-color: rgba(145, 70, 255, 0.50);
+    box-shadow: 0 0 24px rgba(145, 70, 255, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 .link-btn[data-platform="youtube"]:hover {
     background: rgba(255, 30, 30, 0.16);
@@ -404,9 +402,9 @@ main {
     box-shadow: 0 0 24px rgba(255, 30, 30, 0.22), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 .link-btn[data-platform="x"]:hover {
-    background: rgba(255, 255, 255, 0.10);
-    border-color: rgba(255, 255, 255, 0.30);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.12), inset 0 1px 0 rgba(255,255,255,0.08);
+    background: rgba(231, 215, 193, 0.10);
+    border-color: rgba(231, 215, 193, 0.30);
+    box-shadow: 0 0 20px rgba(231, 215, 193, 0.12), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 .link-btn[data-platform="tiktok"]:hover {
     background: rgba(255, 0, 79, 0.14);
@@ -414,9 +412,9 @@ main {
     box-shadow: 0 0 24px rgba(105, 201, 208, 0.22), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 .link-btn[data-platform="github"]:hover {
-    background: rgba(110, 84, 148, 0.22);
-    border-color: rgba(110, 84, 148, 0.55);
-    box-shadow: 0 0 24px rgba(110, 84, 148, 0.28), inset 0 1px 0 rgba(255,255,255,0.08);
+    background: rgba(231, 215, 193, 0.10);
+    border-color: rgba(231, 215, 193, 0.35);
+    box-shadow: 0 0 24px rgba(231, 215, 193, 0.15), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 .link-btn[data-platform="vod"]:hover {
     background: rgba(255, 30, 30, 0.16);
