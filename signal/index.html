@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funkkanal · Mortys Welt</title>
+    <meta name="description" content="Eingehender Funkkanal.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/x-icon" href="../logo.png">
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        /* ── Signal-Finale ── */
+        .signal-card { flex-direction: column; max-width: 640px; position: relative; }
+        .signal-inner { padding: 38px 40px 46px; text-align: center; width: 100%; }
+        @media (max-width: 420px) { .signal-inner { padding: 28px 22px 34px; } }
+
+        /* Oszilloskop-Streifen (Signature) */
+        .wave {
+            display: block; width: 100%; height: 56px;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(140, 28, 19, 0.05);
+        }
+
+        .status {
+            display: inline-flex; align-items: center; gap: 9px;
+            font-size: .72rem; font-weight: 700; letter-spacing: .22em;
+            color: var(--text-muted); text-transform: uppercase; margin: 22px 0 14px;
+        }
+        .status .dot {
+            width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+            box-shadow: 0 0 10px 1px rgba(140, 28, 19, .9);
+            animation: dotPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes dotPulse { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+
+        .signal-title, .reveal-title {
+            font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 900;
+            letter-spacing: -.04em; line-height: 1; color: #e7d7c1; margin-bottom: 16px;
+        }
+        .signal-title { font-feature-settings: "tnum"; }
+        .signal-help { color: var(--text-muted); font-size: .9rem; margin-bottom: 2px; }
+
+        #form { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; justify-content: center; }
+        #code {
+            flex: 1; min-width: 200px; padding: 14px 16px; border-radius: 12px;
+            background: var(--btn-bg); border: 1px solid var(--btn-border);
+            color: #fff; font: inherit; font-size: 1rem; letter-spacing: .04em; text-align: center;
+            caret-color: var(--accent); transition: border-color .2s, box-shadow .2s;
+        }
+        #code:focus { outline: none; border-color: var(--btn-hover-border); box-shadow: 0 0 22px var(--accent-glow); }
+        #send {
+            padding: 14px 24px; border-radius: 12px; border: 1px solid rgba(140,28,19,.5);
+            background: rgba(140,28,19,.22); color: #e7d7c1; font: inherit; font-weight: 700;
+            cursor: pointer; transition: background .2s, transform .2s;
+        }
+        #send:hover { background: rgba(140,28,19,.34); transform: translateY(-2px); }
+        #send:disabled { opacity: .65; cursor: default; transform: none; }
+
+        .signal-error { color: #ff6b6b; font-size: .85rem; margin-top: 16px; min-height: 1em; letter-spacing: .01em; }
+
+        /* ── Reveal ── */
+        .revealed { animation: revealIn .85s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes revealIn { from { opacity: 0; transform: scale(.965); } to { opacity: 1; transform: none; } }
+
+        .eyebrow {
+            font-size: .72rem; font-weight: 700; letter-spacing: .26em;
+            color: var(--accent-warm); text-transform: uppercase; margin-bottom: 14px;
+        }
+        .video-wrap {
+            position: relative; width: 100%; aspect-ratio: 16 / 9; margin: 20px 0 6px;
+            border-radius: 14px; overflow: hidden; border: 1px solid var(--card-border); background: #000;
+        }
+        .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .sub { color: var(--text-muted); font-size: .94rem; margin-top: 16px; line-height: 1.65; }
+
+        .shake { animation: shake .45s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%,90% { transform: translateX(-2px); } 20%,80% { transform: translateX(4px); }
+            30%,50%,70% { transform: translateX(-7px); } 40%,60% { transform: translateX(7px); }
+        }
+
+        /* Konfetti-Overlay */
+        .confetti-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .status .dot { animation: none; opacity: 1; }
+            .revealed { animation: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="starfield" aria-hidden="true"></div>
+
+    <main>
+        <article class="card signal-card" id="card" aria-label="Funkkanal">
+            <canvas class="wave" id="wave" aria-hidden="true"></canvas>
+            <section class="signal-inner" id="view">
+                <p class="status" id="status"><span class="dot"></span><span id="statusText">Eingehender Funkkanal</span></p>
+                <h1 class="signal-title" id="title">Signal zurücksenden</h1>
+                <p class="signal-help">Gib die vollständige entschlüsselte Nachricht ein.</p>
+
+                <form id="form" autocomplete="off">
+                    <input id="code" type="text" inputmode="text" autocomplete="off"
+                           autocapitalize="off" spellcheck="false" placeholder="· · · · ·"
+                           aria-label="Entschlüsselte Nachricht">
+                    <button id="send" type="submit">Senden</button>
+                </form>
+                <p class="signal-error" id="err" role="alert"></p>
+            </section>
+        </article>
+    </main>
+
+    <canvas id="confetti" class="confetti-canvas" aria-hidden="true"></canvas>
+
+    <script>
+    // =====================================================================
+    //  SPOILERSICHERES FINALE
+    //  Reveal-Inhalt (inkl. Video) liegt NUR als AES-256-GCM-Chiffretext vor.
+    //  Schlüssel = eingegebene Nachricht. Falscher Code -> Entschlüsselung
+    //  scheitert. Im Quelltext/Repo steht nichts Lesbares.
+    //  Neu verschlüsseln (echte Video-ID): website-build/finale-verschluesseln.html
+    // =====================================================================
+    const SALT = "Z2cYL7MlDmDmksRKzSqVIg==";
+    const IV   = "6LEWNlTMEeTG8SnQ";
+    const CT   = "5ykfTI99YSkCMf65V6qaEiG34jVJpxoMX9rUTuSTZVj97zZcKearLf+aHnU5QiwPVXtCuNRtav+FNMYWzq3ffbwEn/Sy4Wm8DzIagwleh+NpQz5IJdXYoqunNCpCYqzA9rGU7iUDByrFYCXz+yVyr6TcaSgESdrqeFWB42mU/4pMEDICUnAwXjHrgj989r7ZKiWImSH/T4ACBGee2kc6Pw9OapaFL/Ynmwfdu3+/kQSE1O3YuM6vFTh5lnGfo8U1Dwb29V3el3U02Ct+MDqmyJDoRQemDi1SKVBqcVHK9FdEXFD0hvOx1j1bhSEK1XyqmZd2oubLDNFz9FQJrkwxbf8gsNvGL6ct3/npNjAf7kEnBlshrjVZXUBiPv/PqCfyXoYBIAXv9La8A5gpY0VygmjRUpGrZrbBjtxs1qFlrldVabZendE83unGZkrpl5eBEe5uBRBYhFLULWS9bsaK9sxa8Z/ztJxZC6b17Ec1Bfb2LFf1XFzXz27BWPqzaXG/6PwzY6tZPIxMGsCDojFsEA+zubiu0CcvFubNXYE7MPdKyOp4esdr9vSmg5jSd0caUcyWKVZDDWWKBv+FjyoGYfHJ04VdfTkUXBEJ4z9mF638AKf9SH42rqnYUXUDnIoEb7ovfHM4m4anVyGsq30aBX49GRkZ8P3zRQxxrdDDa3peQUM=";
+
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const $ = (id) => document.getElementById(id);
+    const view = $("view"), card = $("card"), err = $("err"), send = $("send"), code = $("code");
+    const statusText = $("statusText");
+
+    /* ── Helfer ── */
+    function b64ToBytes(s) {
+        const bin = atob(s); const u = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+        return u;
+    }
+    const normalize = (v) => v.toLowerCase().replace(/[^a-z]/g, ""); // muss zum Tool passen
+
+    async function decryptReveal(norm) {
+        const enc = new TextEncoder();
+        const km = await crypto.subtle.importKey("raw", enc.encode(norm), "PBKDF2", false, ["deriveKey"]);
+        const key = await crypto.subtle.deriveKey(
+            { name: "PBKDF2", salt: b64ToBytes(SALT), iterations: 200000, hash: "SHA-256" },
+            km, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+        const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64ToBytes(IV) }, key, b64ToBytes(CT));
+        return new TextDecoder().decode(pt);
+    }
+
+    /* ── Decoder-Scramble (mysteriös/spielerisch) ── */
+    const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*<>/\\▮▯";
+    function scramble(el, text, duration = 1100) {
+        if (reduce) { el.textContent = text; return; }
+        const start = performance.now();
+        const rnd = () => GLYPHS[(Math.random() * GLYPHS.length) | 0];
+        (function frame(now) {
+            const p = Math.min(1, (now - start) / duration);
+            const reveal = Math.floor(p * text.length);
+            let out = "";
+            for (let i = 0; i < text.length; i++)
+                out += (text[i] === " ") ? " " : (i < reveal ? text[i] : rnd());
+            el.textContent = out;
+            if (p < 1) requestAnimationFrame(frame); else el.textContent = text;
+        })(start);
+    }
+
+    /* ── Oszilloskop (Signature): scannt → wird beim Senden unruhig → rastet ein ── */
+    const wave = $("wave"), wctx = wave.getContext("2d");
+    let waveState = "idle", lockMix = 0, dpr = Math.min(devicePixelRatio || 1, 2);
+    function sizeWave() {
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        wave.width = wave.clientWidth * dpr; wave.height = wave.clientHeight * dpr;
+    }
+    addEventListener("resize", sizeWave); sizeWave();
+
+    function drawWave(t) {
+        const w = wave.width, h = wave.height, mid = h / 2;
+        wctx.clearRect(0, 0, w, h);
+        const amp = (waveState === "decoding" ? 0.34 : 0.16) * h * (1 - lockMix) + 0.5 * lockMix;
+        const speed = waveState === "decoding" ? 0.009 : 0.004;
+        const color = waveState === "error" ? "rgba(255,107,107,0.85)" : "rgba(231,215,193,0.8)";
+        // Grundlinie
+        wctx.strokeStyle = color; wctx.lineWidth = 1.4 * dpr; wctx.beginPath();
+        for (let x = 0; x <= w; x += 2 * dpr) {
+            const n = Math.sin(x * 0.025 / dpr + t * speed) + 0.5 * Math.sin(x * 0.011 / dpr - t * speed * 1.7);
+            const jitter = (waveState === "decoding" ? (Math.random() - 0.5) * 0.6 : 0);
+            const y = mid + (n + jitter) * amp;
+            x === 0 ? wctx.moveTo(x, y) : wctx.lineTo(x, y);
+        }
+        wctx.stroke();
+        // Scan-Punkt
+        if (!reduce && lockMix < 1) {
+            const sx = ((t * 0.08 * dpr) % w);
+            const g = wctx.createRadialGradient(sx, mid, 0, sx, mid, 26 * dpr);
+            g.addColorStop(0, "rgba(140,28,19,0.55)"); g.addColorStop(1, "rgba(140,28,19,0)");
+            wctx.fillStyle = g; wctx.fillRect(sx - 26 * dpr, 0, 52 * dpr, h);
+        }
+        if (waveState === "locked" && lockMix < 1) lockMix = Math.min(1, lockMix + 0.04);
+    }
+    function loop(t) { drawWave(t); requestAnimationFrame(loop); }
+    if (reduce) { drawWave(0); } else { requestAnimationFrame(loop); }
+
+    /* ── Konfetti (vanilla, Markenfarben) ── */
+    function fireConfetti() {
+        if (reduce) return;
+        const cv = $("confetti"), ctx = cv.getContext("2d");
+        const d = Math.min(devicePixelRatio || 1, 2);
+        cv.width = innerWidth * d; cv.height = innerHeight * d;
+        const colors = ["#8c1c13", "#e7d7c1", "#ffffff", "#b5342a"];
+        const cx = innerWidth * d / 2, cy = innerHeight * d * 0.32;
+        const P = Array.from({ length: 150 }, () => {
+            const a = Math.random() * Math.PI * 2, sp = (4 + Math.random() * 9) * d;
+            return { x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 5 * d,
+                     s: (5 + Math.random() * 6) * d, c: colors[(Math.random() * colors.length) | 0],
+                     r: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.3, life: 0 };
+        });
+        const t0 = performance.now();
+        (function anim(now) {
+            const el = now - t0; ctx.clearRect(0, 0, cv.width, cv.height);
+            for (const p of P) {
+                p.vy += 0.22 * d; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life = el;
+                ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+                ctx.globalAlpha = Math.max(0, 1 - el / 2600);
+                ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.6); ctx.restore();
+            }
+            if (el < 2700) requestAnimationFrame(anim); else ctx.clearRect(0, 0, cv.width, cv.height);
+        })(t0);
+    }
+
+    /* ── Ablauf ── */
+    const wait = (ms) => new Promise(r => setTimeout(r, ms));
+
+    $("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        err.textContent = "";
+        const norm = normalize(code.value);
+        if (!norm) return;
+        send.disabled = true; send.textContent = "…";
+        waveState = "decoding"; statusText.textContent = "Entschlüssele…";
+        try {
+            const html = await decryptReveal(norm);
+            await wait(reduce ? 0 : 750);          // kurze Dramatik
+            waveState = "locked"; statusText.textContent = "Signal entschlüsselt";
+            view.innerHTML = html;
+            view.classList.add("revealed");
+            const eb = view.querySelector("[data-scramble]");
+            if (eb) scramble(eb, eb.textContent, 900);
+            fireConfetti();
+        } catch (_) {
+            await wait(reduce ? 0 : 350);
+            waveState = "error"; statusText.textContent = "Kein Empfang";
+            err.textContent = "Code nicht erkannt. Versuch es nochmal.";
+            send.disabled = false; send.textContent = "Senden";
+            card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+            setTimeout(() => { if (waveState === "error") { waveState = "idle"; statusText.textContent = "Eingehender Funkkanal"; } }, 1400);
+        }
+    });
+
+    /* ── Anfang: Titel entschlüsselt sich ── */
+    scramble($("title"), "Signal zurücksenden", 1200);
+    </script>
+</body>
+</html>
