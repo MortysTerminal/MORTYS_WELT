@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Die Rätselkammer · Mortys Welt</title>
+<meta name="description" content="Verschlüsselte Funkstation – löse die Rätsel, empfange das Signal.">
+<link rel="icon" type="image/x-icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a12;
+    --panel:rgba(18,18,28,.66);
+    --line:rgba(255,255,255,.08);
+    --gelb:#FFE44E;
+    --gelb-soft:rgba(255,228,78,.14);
+    --signal:#54E6C5;
+    --signal-soft:rgba(84,230,197,.12);
+    --txt:#EDEDF4;
+    --muted:rgba(237,237,244,.55);
+    --no:#FF6B7A;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    color:var(--txt);
+    background:
+      radial-gradient(1200px 760px at 16% -12%, rgba(255,228,78,.07), transparent 58%),
+      radial-gradient(1000px 680px at 90% 112%, rgba(84,230,197,.08), transparent 60%),
+      var(--bg);
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    padding:40px 18px 28px;overflow-x:hidden;
+  }
+
+  /* ── Sternenhimmel (CSS-only) ── */
+  .starfield{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .starfield i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.7;animation:tw 4s ease-in-out infinite}
+  @keyframes tw{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:.9;transform:scale(1.1)}}
+
+  .wrap{position:relative;z-index:1;width:100%;max-width:740px;display:flex;flex-direction:column;align-items:center;gap:24px}
+
+  /* ── Header ── */
+  header{text-align:center}
+  .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.34em;text-transform:uppercase;color:var(--signal);opacity:.85}
+  h1{font-size:clamp(2.1rem,6vw,3.2rem);font-weight:900;letter-spacing:-.02em;line-height:1;margin-top:10px}
+  h1 em{font-style:normal;color:var(--gelb)}
+  .sub{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin-top:12px;letter-spacing:.06em}
+  .blink{color:var(--signal);animation:blink 1.1s step-end infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  /* ── Progress ── */
+  .progress{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+  .pdot{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+    font-family:var(--mono);font-size:.85rem;font-weight:700;
+    background:rgba(255,255,255,.03);border:1.5px solid var(--line);color:var(--muted);transition:.35s}
+  .pdot.active{border-color:var(--gelb);color:var(--gelb);background:var(--gelb-soft)}
+  .pdot.done{border-color:var(--signal);color:var(--signal);background:var(--signal-soft)}
+
+  /* ── Panel ── */
+  .panel{width:100%;background:var(--panel);border:1.5px solid var(--line);border-radius:22px;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    padding:34px 32px 28px;box-shadow:0 30px 70px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05);
+    position:relative;overflow:hidden}
+  .panel::after{content:"";position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--gelb),transparent);opacity:.5}
+
+  .tag{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);
+    font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--gelb);background:var(--gelb-soft);padding:7px 13px;border-radius:8px;margin-bottom:20px}
+  .tag .dot{width:7px;height:7px;border-radius:50%;background:var(--gelb);box-shadow:0 0 10px var(--gelb)}
+
+  .riddle{font-size:clamp(1.18rem,2.5vw,1.5rem);font-weight:600;line-height:1.55}
+  .riddle .hl{color:var(--gelb)}
+
+  .answer-row{display:flex;gap:11px;margin-top:24px;flex-wrap:wrap}
+  input[type=text]{flex:1;min-width:190px;font-family:'Inter';font-weight:600;font-size:1.15rem;color:var(--txt);
+    background:rgba(0,0,0,.32);border:2px solid var(--line);border-radius:13px;padding:14px 17px;outline:none;transition:.18s}
+  input::placeholder{color:rgba(237,237,244,.30)}
+  input:focus{border-color:var(--gelb);box-shadow:0 0 0 4px var(--gelb-soft)}
+  input.wrong{border-color:var(--no);animation:shake .42s}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+
+  button{font-family:'Inter';cursor:pointer;border:none;transition:.16s}
+  .btn{font-weight:800;font-size:1.02rem;color:#15130a;background:var(--gelb);
+    padding:14px 26px;border-radius:13px;box-shadow:0 8px 22px rgba(255,228,78,.26)}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,228,78,.36)}
+  .btn:active{transform:translateY(0)}
+
+  .meta{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap}
+  .btn-hint{background:transparent;color:var(--muted);font-weight:600;font-size:.9rem;border:1.5px solid var(--line);border-radius:10px;padding:9px 15px}
+  .btn-hint:hover{color:var(--gelb);border-color:var(--gelb-soft)}
+  .kbd{font-family:var(--mono);font-size:.76rem;color:var(--muted)}
+  .hint{font-size:.95rem;color:var(--gelb);background:var(--gelb-soft);border-radius:11px;
+    max-height:0;overflow:hidden;opacity:0;transition:.35s;line-height:1.5}
+  .hint.show{max-height:160px;opacity:1;padding:13px 16px;margin-top:14px}
+  .feedback{min-height:22px;margin-top:14px;font-weight:700;font-size:1rem}
+  .feedback.ok{color:var(--signal)}
+  .feedback.no{color:var(--no)}
+
+  /* ── Empfangene Koordinaten ── */
+  .receiver{width:100%;display:flex;flex-direction:column;align-items:center;gap:13px}
+  .receiver-label{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .cells{display:flex;gap:11px;flex-wrap:wrap;justify-content:center}
+  .cell{width:60px;height:62px;border-radius:12px;display:grid;place-items:center;
+    font-family:var(--mono);font-size:1.5rem;font-weight:700;
+    background:rgba(255,255,255,.02);border:2px dashed var(--line);color:rgba(255,255,255,.16);transition:.4s}
+  .cell.filled{border:2px solid var(--signal);border-style:solid;color:var(--signal);background:var(--signal-soft);
+    box-shadow:0 0 20px rgba(84,230,197,.3);animation:pulse .6s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes pulse{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+
+  /* ── Start / Win ── */
+  .center{text-align:center}
+  .lead{font-size:1.06rem;color:var(--muted);line-height:1.65;max-width:520px;margin:16px auto 26px}
+  .win h2{font-size:clamp(1.8rem,5vw,2.5rem);font-weight:900;color:var(--signal);margin-bottom:12px;line-height:1.1}
+  .codeline{font-family:var(--mono);font-size:clamp(1.4rem,4vw,2rem);font-weight:700;color:var(--signal);
+    letter-spacing:.12em;margin:14px 0 6px;word-spacing:.3em}
+  .decode-note{font-family:var(--mono);font-size:.82rem;color:var(--muted);line-height:1.6;
+    background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:20px auto 0;max-width:460px}
+  .decode-note b{color:var(--gelb)}
+
+  footer{font-family:var(--mono);font-size:.74rem;color:rgba(237,237,244,.3);text-align:center;letter-spacing:.04em}
+  .reset{background:none;color:rgba(237,237,244,.4);font-weight:600;text-decoration:underline;font-size:.78rem;padding:3px;font-family:'Inter';cursor:pointer}
+  .reset:hover{color:var(--gelb)}
+
+  .confetti{position:fixed;top:-12px;width:9px;height:13px;z-index:5;pointer-events:none;border-radius:2px}
+  .hidden{display:none !important}
+
+  @media (max-width:520px){
+    .cell{width:50px;height:54px;font-size:1.25rem}
+    .panel{padding:26px 20px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001s !important;transition-duration:.05s !important}
+    .starfield{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="starfield" id="stars" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Mortys Welt · Verschlüsselte Übertragung</div>
+    <h1>Die <em>Rätselkammer</em></h1>
+    <p class="sub" id="sub">// Funkstation offline<span class="blink">_</span></p>
+  </header>
+
+  <div class="progress" id="progress"></div>
+
+  <!-- START -->
+  <div class="panel center" id="startCard">
+    <div class="riddle center" style="margin-bottom:0">Sechs Rätsel. Sechs Koordinaten. Ein Signal.</div>
+    <p class="lead">Diese Station sendet ein verschlüsseltes Wort – aber nur Stück für Stück. Löst der Chat ein Rätsel, empfangt ihr ein Koordinatenpaar. Habt ihr alle sechs, übersetzt ihr sie mit dem <b style="color:var(--gelb)">Polybius-Gitter</b> in das Lösungswort. Es zeigt euch den Weg weiter.</p>
+    <button class="btn" id="startBtn">Übertragung starten</button>
+  </div>
+
+  <!-- GAME -->
+  <div class="panel hidden" id="gameCard">
+    <div class="tag"><span class="dot"></span><span id="roomTag">Frequenz 1 / 6</span></div>
+    <p class="riddle" id="riddleText"></p>
+
+    <div class="answer-row">
+      <input type="text" id="answer" placeholder="Antwort des Chats…" autocomplete="off" spellcheck="false">
+      <button class="btn" id="checkBtn">Senden</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="meta">
+      <button class="btn-hint" id="hintBtn">Tipp anfordern</button>
+      <span class="kbd">↵ Enter = Senden</span>
+    </div>
+    <div class="hint" id="hint"></div>
+  </div>
+
+  <!-- WIN -->
+  <div class="panel center win hidden" id="winCard">
+    <h2>📡 Übertragung vollständig</h2>
+    <p class="lead" style="margin-bottom:4px">Sechs Koordinatenpaare empfangen:</p>
+    <div class="codeline" id="codeline">–– –– –– –– –– ––</div>
+    <div class="decode-note">
+      Löse es über dein <b>Polybius-Gitter</b>.<br>
+      Das entschlüsselte Wort ist dein Schlüssel zur nächsten Station.
+      Gib es in den Browser ein: https://mortys-welt.com/DEIN-WORT-HIER
+    </div>
+    <button class="btn" id="againBtn" style="margin-top:26px">Nochmal von vorne</button>
+  </div>
+
+  <!-- RECEIVER -->
+  <div class="receiver">
+    <div class="receiver-label">Empfangene Koordinaten</div>
+    <div class="cells" id="cells"></div>
+  </div>
+
+  <footer>
+    MORTYS WELT · Funkstation &nbsp;·&nbsp; <button class="reset" id="resetBtn">zurücksetzen</button>
+  </footer>
+</div>
+
+<script>
+/* ───────── Rätsel → Polybius-Koordinaten (SIGNAL = 43 24 22 33 11 31) ───────── */
+const ROOMS = [
+  { tag:"Die Logik-Falle",
+    riddle:"Ein Bauer hat 17 Schafe. Alle <span class='hl'>bis auf 9</span> laufen davon. Wie viele Schafe bleiben übrig?",
+    accept:["9","neun"], coord:"43",
+    found:"Eine Frequenz rastet ein: 4-3.",
+    hint:"Genau lesen! 'Alle bis auf 9 laufen weg' heißt: 9 bleiben stehen." },
+
+  { tag:"Das Wort-Rätsel",
+    riddle:"Ich habe Städte, doch keine Häuser. Ich habe Berge, doch keine Bäume. Ich habe Wasser, doch keine Fische. <span class='hl'>Was bin ich?</span>",
+    accept:["karte","landkarte","weltkarte","stadtplan","atlas"], coord:"24",
+    found:"Signal empfangen: 2-4.",
+    hint:"Du faltest mich zusammen, steckst mich ins Handschuhfach oder hängst mich an die Wand." },
+
+  { tag:"Der Zahlen-Trick",
+    riddle:"Denk dir eine Zahl. Verdopple sie. Zähl 8 dazu. Halbiere das Ergebnis. Zieh deine Ausgangszahl wieder ab. <span class='hl'>Welche Zahl bleibt übrig – egal womit du gestartet bist?</span>",
+    accept:["4","vier"], coord:"22",
+    found:"Frequenz stabil: 2-2.",
+    hint:"Probier's mit 2, dann mit 10 – kommt jedes Mal das Gleiche raus? (Tipp: 8 ÷ 2)" },
+
+  { tag:"Das Wissens-Schloss",
+    riddle:"Welcher Planet kreist unserer Sonne am allernächsten? <span class='hl'>Der kleinste im System.</span>",
+    accept:["merkur","mercury"], coord:"33",
+    found:"Koordinate entschlüsselt: 3-3.",
+    hint:"Er ist nach dem flinken römischen Götterboten benannt." },
+
+  { tag:"Das Nass-Paradox",
+    riddle:"Je mehr ich trockne, desto nasser werde ich selbst. <span class='hl'>Was bin ich?</span>",
+    accept:["handtuch","tuch","badetuch","handtücher"], coord:"11",
+    found:"Signal empfangen: 1-1.",
+    hint:"Du greifst nach mir, wenn du aus der Dusche kommst." },
+
+  { tag:"Das Spiegel-Rätsel",
+    riddle:"Welches Wort wird <span class='hl'>kürzer</span>, wenn man zwei Buchstaben anhängt?",
+    accept:["kurz","kürzer","kuerzer"], coord:"31",
+    found:"Letzte Frequenz: 3-1.",
+    hint:"Das Wort beschreibt selbst, was passiert: aus 'kurz' wird …" }
+];
+
+/* ───────── State ───────── */
+let idx=0; const got=[];
+
+/* ───────── Helpers ───────── */
+const $ = id => document.getElementById(id);
+const startCard=$("startCard"), gameCard=$("gameCard"), winCard=$("winCard");
+const progress=$("progress"), cells=$("cells"), sub=$("sub");
+const roomTag=$("roomTag"), riddleText=$("riddleText");
+const answer=$("answer"), feedback=$("feedback"), hint=$("hint");
+
+function buildProgress(){
+  progress.innerHTML="";
+  ROOMS.forEach((_,i)=>{const d=document.createElement("div");d.className="pdot";d.textContent=i+1;d.id="pd"+i;progress.appendChild(d);});
+}
+function buildCells(){
+  cells.innerHTML="";
+  for(let i=0;i<ROOMS.length;i++){const c=document.createElement("div");c.className="cell";c.id="c"+i;c.textContent="··";cells.appendChild(c);}
+}
+function refreshProgress(){
+  ROOMS.forEach((_,i)=>{$("pd"+i).className="pdot"+(i<idx?" done":"")+(i===idx?" active":"");});
+}
+function norm(s){
+  return s.toLowerCase().trim()
+    .replace(/[.,!?;:"'´`]/g,"")
+    .replace(/\b(der|die|das|ein|eine|einen|dem|den|ich|bin)\b/g," ")
+    .replace(/\s+/g," ").trim();
+}
+
+function loadRoom(){
+  const r=ROOMS[idx];
+  roomTag.textContent=`Frequenz ${idx+1} / ${ROOMS.length} · ${r.tag}`;
+  riddleText.innerHTML=r.riddle;
+  answer.value=""; answer.placeholder="Antwort des Chats…";
+  feedback.textContent=""; feedback.className="feedback";
+  hint.textContent=r.hint; hint.classList.remove("show");
+  sub.innerHTML=`// Empfange Frequenz ${idx+1}<span class="blink">_</span>`;
+  refreshProgress();
+  setTimeout(()=>answer.focus(),60);
+}
+
+function check(){
+  const r=ROOMS[idx]; const v=norm(answer.value);
+  if(!v) return;
+  const ok=r.accept.some(a=>norm(a)===v);
+  if(ok){
+    feedback.className="feedback ok"; feedback.textContent="✓ "+r.found;
+    got.push(r.coord);
+    const cell=$("c"+(got.length-1));
+    if(cell){cell.textContent=r.coord;cell.classList.add("filled");}
+    answer.blur();
+    setTimeout(()=>{ idx++; if(idx>=ROOMS.length) winScreen(); else loadRoom(); }, 1400);
+  } else {
+    feedback.className="feedback no"; feedback.textContent="✗ Kein klares Signal – nochmal!";
+    answer.classList.add("wrong"); setTimeout(()=>answer.classList.remove("wrong"),450);
+  }
+}
+
+function winScreen(){
+  gameCard.classList.add("hidden"); winCard.classList.remove("hidden");
+  $("codeline").textContent=got.join(" ");
+  sub.innerHTML='// Signal vollständig empfangen <span class="blink">_</span>';
+  ROOMS.forEach((_,i)=>$("pd"+i).className="pdot done");
+  confetti();
+}
+function confetti(){
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cols=["#FFE44E","#54E6C5","#ffffff"];
+  for(let i=0;i<80;i++){
+    const c=document.createElement("div");c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=cols[Math.floor(Math.random()*cols.length)];
+    const dur=2.6+Math.random()*2.2, delay=Math.random()*.5;
+    document.body.appendChild(c);
+    c.animate([{transform:"translateY(0) rotate(0)",opacity:1},
+               {transform:`translateY(110vh) rotate(${720+Math.random()*360}deg)`,opacity:1}],
+              {duration:dur*1000,delay:delay*1000,easing:"cubic-bezier(.3,.6,.5,1)"});
+    setTimeout(()=>c.remove(),(dur+delay)*1000);
+  }
+}
+
+function reset(){
+  idx=0; got.length=0; buildCells();
+  winCard.classList.add("hidden"); gameCard.classList.add("hidden"); startCard.classList.remove("hidden");
+  sub.innerHTML='// Funkstation offline<span class="blink">_</span>';
+  refreshProgress();
+}
+function start(){ startCard.classList.add("hidden"); gameCard.classList.remove("hidden"); loadRoom(); }
+
+function makeStars(){
+  const s=$("stars"); const n=70;
+  for(let i=0;i<n;i++){
+    const star=document.createElement("i");
+    star.style.left=Math.random()*100+"vw";
+    star.style.top=Math.random()*100+"vh";
+    star.style.animationDelay=(Math.random()*4)+"s";
+    const sz=(Math.random()*1.6+1).toFixed(1);
+    star.style.width=star.style.height=sz+"px";
+    s.appendChild(star);
+  }
+}
+
+/* ───────── Events ───────── */
+$("startBtn").onclick=start;
+$("checkBtn").onclick=check;
+$("hintBtn").onclick=()=>hint.classList.toggle("show");
+$("resetBtn").onclick=reset;
+$("againBtn").onclick=()=>{reset();start();};
+answer.addEventListener("keydown",e=>{if(e.key==="Enter")check();});
+
+/* ───────── Init ───────── */
+buildProgress(); buildCells(); makeStars();
+</script>
+</body>
+</html>
