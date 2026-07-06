@@ -146,16 +146,16 @@
   <header>
     <div class="eyebrow">Mortys Welt · Verschlüsselte Übertragung</div>
     <h1>Die <em>Rätselkammer</em></h1>
-    <p class="sub" id="sub">// Funkstation offline<span class="blink">_</span></p>
+    <p class="sub" id="sub">// Piep piep piep<span class="blink">_</span></p>
   </header>
 
   <div class="progress" id="progress"></div>
 
   <!-- START -->
   <div class="panel center" id="startCard">
-    <div class="riddle center" style="margin-bottom:0">Sechs Rätsel. Sechs Koordinaten. Ein Signal.</div>
-    <p class="lead">Diese Station sendet ein verschlüsseltes Wort – aber nur Stück für Stück. Löst der Chat ein Rätsel, empfangt ihr ein Koordinatenpaar. Habt ihr alle sechs, übersetzt ihr sie mit dem <b style="color:var(--gelb)">Polybius-Gitter</b> in das Lösungswort. Es zeigt euch den Weg weiter.</p>
-    <button class="btn" id="startBtn">Übertragung starten</button>
+    <div class="riddle center" style="margin-bottom:0">Sechs Rätsel. Sechs Koordinaten. Eine Lösung.</div>
+    <p class="lead">Diese Station sendet ein verschlüsseltes Wort – aber nur Stück für Stück. Habt ihr alle sechs, übersetzt ihr es in das Lösungswort. Dies muss vom Chat gelöst werden. </p>
+    <button class="btn" id="startBtn"><Samp></Samp>Starten</button>
   </div>
 
   <!-- GAME -->
@@ -183,11 +183,10 @@
     <p class="lead" style="margin-bottom:4px">Sechs Koordinatenpaare empfangen:</p>
     <div class="codeline" id="codeline">–– –– –– –– –– ––</div>
     <div class="decode-note">
-      Löse es über dein <b>Polybius-Gitter</b>.<br>
       Das entschlüsselte Wort ist dein Schlüssel zur nächsten Station.
-      Gib es in den Browser ein: https://mortys-welt.com/DEIN-WORT-HIER
+      Gib es in den Browser ein: https://mortys-welt.com/[DEIN-WORT-HIER]
     </div>
-    <button class="btn" id="againBtn" style="margin-top:26px">Nochmal von vorne</button>
+    <!-- <button class="btn" id="againBtn" style="margin-top:26px">Nochmal von vorne</button> -->
   </div>
 
   <!-- RECEIVER -->
@@ -234,11 +233,11 @@ const ROOMS = [
     found:"Signal empfangen: 1-1.",
     hint:"Du greifst nach mir, wenn du aus der Dusche kommst." },
 
-  { tag:"Das Spiegel-Rätsel",
-    riddle:"Welches Wort wird <span class='hl'>kürzer</span>, wenn man zwei Buchstaben anhängt?",
-    accept:["kurz","kürzer","kuerzer"], coord:"31",
+  { tag:"Das Echo-Rätsel",
+    riddle:"Ich spreche ohne Mund und höre ohne Ohren. Ich habe keinen Körper – doch ich erwache, wenn du rufst. Was bin ich?",
+    accept:["echo","das echo","ein echo","nachhall"], coord:"31",
     found:"Letzte Frequenz: 3-1.",
-    hint:"Das Wort beschreibt selbst, was passiert: aus 'kurz' wird …" }
+    hint:"Ruf laut in eine Bergschlucht oder eine leere Halle – ich rufe dir zurück." }
 ];
 
 /* ───────── State ───────── */
@@ -347,7 +346,7 @@ $("startBtn").onclick=start;
 $("checkBtn").onclick=check;
 $("hintBtn").onclick=()=>hint.classList.toggle("show");
 $("resetBtn").onclick=reset;
-$("againBtn").onclick=()=>{reset();start();};
+//$("againBtn").onclick=()=>{reset();start();};
 answer.addEventListener("keydown",e=>{if(e.key==="Enter")check();});
 
 /* ───────── Init ───────── */
