@@ -103,8 +103,23 @@
   .gift{margin-top:18px;font-size:1.05rem;color:var(--txt);opacity:0;transition:opacity .8s}
   .gift.show{opacity:1}
 
+  /* ── Zufalls-Gag-Layer ── */
+  .decoy{position:fixed;z-index:4;color:var(--txt);background:rgba(255,255,255,.05);
+    border:1.5px solid var(--line);border-radius:15px;font-family:'Inter';font-weight:800;
+    padding:11px 22px;font-size:.92rem;cursor:pointer;transition:opacity .2s,transform .2s;
+    animation:decoyIn .3s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes decoyIn{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+  .shakefx{animation:shakefx .5s cubic-bezier(.36,.07,.19,.97)}
+  @keyframes shakefx{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}
+    30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
+  #nein.waddle{animation:waddle .5s ease-in-out infinite}
+  @keyframes waddle{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+
   .hidden{display:none !important}
-  @media (prefers-reduced-motion:reduce){.starfield{display:none}body.party{animation:none}}
+  @media (prefers-reduced-motion:reduce){
+    .starfield{display:none}body.party{animation:none}
+    .shakefx,#nein.waddle,.decoy{animation:none !important}
+  }
 </style>
 </head>
 <body>
@@ -159,7 +174,9 @@ function fanfare(){const notes=[523.25,659.25,783.99,1046.5,1318.5];notes.forEac
 
 /* ───────── Nein-Button: Ausweichen ───────── */
 const nein=document.getElementById('nein'), ja=document.getElementById('ja'), counter=document.getElementById('counter');
-let dodges=0, jaScale=1, lastDodge=0, loose=false, dodgingEnabled=true, fallbackUsed=false;
+let dodges=0, jaScale=1, lastDodge=0, loose=false, dodgingEnabled=true, surrendered=false;
+let swapped=false, cdBusy=false, lastGag='', decoys=[], gagLock=false, dialogSeen=false, dialogOpen=false;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const NEIN_LABELS=["Nein","Nein?","Bist du sicher?","Wirklich jetzt?","Denk nochmal nach",
   "Falsche Taste!","Das war kein Angebot","Versuch's weiter","Niemals","fast…",
@@ -168,6 +185,10 @@ const JA_LABELS=[[0,"Ja"],[2,"Ja!"],[4,"Ja!!"],[6,"JAAA!"],[9,"NA KLAR!"],[13,"J
 const TAUNTS=["Zu langsam!","Knapp daneben!","Nice try","Nope.","Glitscht weg wie ein Peeper",
   "Schnell wie ein Reaper, was?","Nicht mit mir!","Falsche Richtung!","Du willst doch eh 'Ja'",
   "98% Ausweichquote","der Button trainiert für Olympia","war wohl nix"];
+const INSIDERS=["Hatschi. 🤧 Ein Paket? Bin allergisch, weißt du doch.",
+  "In Goose Goose Duck killst du mich eh jede Runde.",
+  "Nein? Sagt die, die mich als Ente cosplayen ließ.",
+  "Wubba lubba dub… nein, falscher Morty."];
 
 function goLoose(){
   if(loose) return;
@@ -180,7 +201,7 @@ function goLoose(){
 }
 
 function dodge(){
-  if(!dodgingEnabled) return;
+  if(!dodgingEnabled || gagLock) return;
   const now=Date.now(); if(now-lastDodge<200) return; lastDodge=now;
   goLoose();
   dodges++;
@@ -198,15 +219,18 @@ function dodge(){
   // dezent schrumpfen, aber immer gut sichtbar
   const shrink=Math.max(.72, 1-dodges*0.03);
   nein.style.transform='scale('+shrink+')';
-  nein.textContent=NEIN_LABELS[Math.min(dodges,NEIN_LABELS.length-1)];
+  if(!swapped) nein.textContent=NEIN_LABELS[Math.min(dodges,NEIN_LABELS.length-1)];
   // Ja wächst
   jaScale=Math.min(2.8, jaScale*1.08);
   ja.style.transform='scale('+jaScale+')';
-  let jl="Ja"; JA_LABELS.forEach(p=>{if(dodges>=p[0])jl=p[1];}); ja.textContent=jl;
+  let jl="Ja"; JA_LABELS.forEach(p=>{if(dodges>=p[0])jl=p[1];}); if(!swapped) ja.textContent=jl;
   // Spruch + Sound
   toast(TAUNTS[Math.floor(Math.random()*TAUNTS.length)], bx+w/2, by);
   blip(220+Math.random()*120, .12, 'square', .035);
   updateCounter();
+  runGag(bx+w/2, by);                        // Zufalls-Gag drüberlegen
+  if(dodges===6 && !dialogSeen){ dialogSeen=true; errorDialog(); } // einmaliger Fake-Fehler
+  if(dodges>=14) setTimeout(surrender, 420); // irgendwann gibt er auf
 }
 
 function updateCounter(){
@@ -233,36 +257,253 @@ document.addEventListener('pointermove',e=>{
 ['mouseenter','pointerenter','pointerdown','touchstart'].forEach(ev=>{
   nein.addEventListener(ev,e=>{ if(ev==='touchstart'||ev==='pointerdown')e.preventDefault(); dodge('direct'); },{passive:false});
 });
-// falls sie es DOCH schafft (z.B. per Tastatur): nicht akzeptieren, sondern liebevoll umlenken
-nein.addEventListener('click',e=>{e.preventDefault(); neinFallback();});
+// falls sie ihn DOCH erwischt (z.B. per Tastatur): der Knopf kapituliert und watschelt rüber
+nein.addEventListener('click',e=>{e.preventDefault(); surrender();});
 
-function neinFallback(){
-  if(fallbackUsed) return; fallbackUsed=true; dodgingEnabled=false;
-  ac(); nein.style.display='none';
+/* ───────── Zufalls-Gag-Mix ───────── */
+function runGag(x,y){
+  if(surrendered || gagLock) return;
+  const roll=Math.random();
+  let g='';
+  if(roll<0.45)        g='';           // meistens: nur normales Fliehen
+  else if(roll<0.53)   g='insider';
+  else if(roll<0.60)   g='roar';
+  else if(roll<0.66)   g='bait';
+  else if(roll<0.71)   g='hydra';
+  else if(roll<0.76)   g='warp';
+  else if(roll<0.81)   g='polyglott';
+  else if(roll<0.86)   g='giant';
+  else if(roll<0.90)   g='cloak';
+  else if(roll<0.935)  g='gravity';
+  else if(roll<0.965)  g='peeper';
+  else                 g='countdown';
+  if(g===lastGag && g!=='') g='';      // nicht zweimal derselbe Gag am Stück
+  lastGag=g;
+  if(g==='insider')        insiderToast(x,y);
+  else if(g==='roar')      roar(x,y);
+  else if(g==='bait')      baitSwitch();
+  else if(g==='hydra')     hydra();
+  else if(g==='warp')      warp(x,y);
+  else if(g==='polyglott') polyglott();
+  else if(g==='giant')     giant(x,y);
+  else if(g==='cloak')     cloak(x,y);
+  else if(g==='gravity')   gravity(x,y);
+  else if(g==='peeper')    peeper(x,y);
+  else if(g==='countdown') countdownFake(x,y);
+}
+
+function insiderToast(x,y){ toast(INSIDERS[Math.floor(Math.random()*INSIDERS.length)], x, y-30); }
+
+/* Kurzer, leiser Reaper-Roar + dezentes Ruckeln */
+function roar(x,y){
+  toast("Detected: 1 Leviathan class lifeform.", x, y-30);
+  blip(90,.5,'sawtooth',.05); setTimeout(()=>blip(58,.55,'sine',.045),90);
+  if(!reduce){ const wrap=document.querySelector('.wrap');
+    wrap.classList.remove('shakefx'); void wrap.offsetWidth; wrap.classList.add('shakefx'); }
+}
+
+/* Warper-Teleport: Knopf wird eingesaugt und taucht anderswo wieder auf */
+function warp(x,y){
+  toast("Ein Warper hat den Knopf versetzt.", x, y-30);
+  blip(880,.08,'sine',.05); setTimeout(()=>blip(180,.14,'sawtooth',.045),70);
+  if(reduce || gagLock) return; gagLock=true;
+  const w=nein.offsetWidth, h=nein.offsetHeight, m=18;
+  nein.style.transition='transform .12s, opacity .12s';
+  nein.style.transform='scale(.2)'; nein.style.opacity='0';                 // einsaugen
+  setTimeout(()=>{
+    nein.style.transition='none';                                          // instant versetzen
+    nein.style.left=(m+Math.random()*(window.innerWidth -w-2*m))+'px';
+    nein.style.top =(m+Math.random()*(window.innerHeight-h-2*m))+'px';
+    requestAnimationFrame(()=>{
+      nein.style.transition='transform .18s cubic-bezier(.34,1.56,.64,1), opacity .18s';
+      nein.style.transform=''; nein.style.opacity='1';                     // auftauchen
+      setTimeout(()=>{ nein.style.transition=''; gagLock=false; }, 220);
+    });
+  }, 130);
+}
+
+/* Größen-Troll: wird kurz riesig ("den triffst du DOCH") und schrumpft dann weg */
+function giant(x,y){
+  toast("Na, DEN triffst du ja wohl.", x, y-30); blip(500,.12,'triangle',.04);
+  if(reduce || gagLock) return; gagLock=true;
+  nein.style.transition='transform .3s cubic-bezier(.34,1.56,.64,1)';
+  nein.style.transform='scale(2.4)';
+  setTimeout(()=>{
+    nein.style.transform='scale(.55)'; blip(240,.14,'square',.04);
+    const r=nein.getBoundingClientRect(); toast("…ups. Doch nicht.", r.left+r.width/2, r.top);
+    setTimeout(()=>{ nein.style.transition=''; nein.style.transform=''; gagLock=false; }, 340);
+  }, 900);
+}
+
+/* Tarnung: Cyclops Silent Running — Knopf wird "unsichtbar", nur der Umriss bleibt */
+function cloak(x,y){
+  toast("Cyclops: Silent Running aktiviert.", x, y-30); blip(300,.3,'sine',.03);
+  if(reduce || gagLock) return; gagLock=true;
+  nein.style.transition='background .4s, color .4s';
+  nein.style.background='transparent'; nein.style.color='transparent';     // nur die Border bleibt
+  setTimeout(()=>{
+    nein.style.background=''; nein.style.color='';
+    setTimeout(()=>{ nein.style.transition=''; gagLock=false; }, 420);
+  }, 1200);
+}
+
+/* Schwerkraft: Knopf fällt unten raus und plumpst oben wieder rein */
+function gravity(x,y){
+  toast("Ups — Schwerkraft.", x, y-30);
+  if(reduce || gagLock){ blip(120,.2,'sawtooth',.04); return; } gagLock=true;
+  blip(200,.5,'sawtooth',.04);
+  const w=nein.offsetWidth, h=nein.offsetHeight, m=18;
+  nein.style.transition='top .6s cubic-bezier(.5,0,.9,.3)';
+  nein.style.top=(window.innerHeight+90)+'px';                              // rausfallen
+  setTimeout(()=>{
+    nein.style.transition='none';
+    nein.style.top=(-h-30)+'px';
+    nein.style.left=(m+Math.random()*(window.innerWidth-w-2*m))+'px';
+    requestAnimationFrame(()=>{
+      nein.style.transition='top .55s cubic-bezier(.34,1.7,.6,1)';
+      nein.style.top=(m+Math.random()*(window.innerHeight*0.5))+'px';       // wieder reinplumpsen
+      setTimeout(()=>{ nein.style.transition=''; gagLock=false; }, 580);
+    });
+  }, 640);
+}
+
+/* Peeper frisst den Knopf: ein Fisch schwimmt durch, verschluckt ihn, spuckt ihn woanders aus */
+function peeper(x,y){
+  toast("Ein Peeper hat ihn geschluckt.", x, y-30);
+  if(reduce || gagLock){ blip(400,.1,'square',.03); return; } gagLock=true;
+  const r=nein.getBoundingClientRect();
+  const fish=document.createElement('div'); fish.textContent='🐟';
+  fish.style.cssText='position:fixed;z-index:6;font-size:40px;pointer-events:none;left:-70px;top:'+(r.top-6)+'px;transition:left 1.1s linear';
+  document.body.appendChild(fish);
+  requestAnimationFrame(()=>{ fish.style.left=(window.innerWidth+70)+'px'; });
+  const eat=Math.max(60, ((r.left+70)/(window.innerWidth+140))*1100);
+  setTimeout(()=>{ nein.style.transition='opacity .12s'; nein.style.opacity='0'; blip(300,.12,'square',.035); }, eat);
+  setTimeout(()=>{
+    const w=nein.offsetWidth, h=nein.offsetHeight, m=18;
+    nein.style.transition='none';
+    nein.style.left=(m+Math.random()*(window.innerWidth-w-2*m))+'px';
+    nein.style.top =(m+Math.random()*(window.innerHeight-h-2*m))+'px';
+    requestAnimationFrame(()=>{
+      nein.style.transition='opacity .25s'; nein.style.opacity='1';
+      const rr=nein.getBoundingClientRect(); toast("…pfff, wieder ausgespuckt.", rr.left+rr.width/2, rr.top);
+      blip(520,.12,'triangle',.04);
+      setTimeout(()=>{ nein.style.transition=''; gagLock=false; }, 280);
+    });
+  }, eat+320);
+  setTimeout(()=>fish.remove(), 1250);
+}
+
+/* Fake-Fehlerdialog: "Nein.exe funktioniert nicht mehr" — Ausgang nur über "Trotzdem Ja" */
+function errorDialog(){
+  if(dialogOpen || surrendered) return; dialogOpen=true;
+  blip(196,.22,'square',.05); setTimeout(()=>blip(147,.28,'square',.05),120);   // Windows-Fehlerton-Anmutung
   const ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;z-index:8;display:grid;place-items:center;background:rgba(8,8,14,.88);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);padding:24px;text-align:center';
-  const panel=document.createElement('div');
-  panel.style.cssText='max-width:520px;background:var(--panel);border:1.5px solid var(--no);border-radius:20px;padding:38px 30px;box-shadow:0 30px 70px rgba(0,0,0,.55)';
-  const line=document.createElement('div');
-  line.style.cssText='font-family:var(--mono);font-size:clamp(1.05rem,3vw,1.25rem);line-height:1.55;color:var(--txt);min-height:3.2em';
-  panel.appendChild(line); ov.appendChild(panel); document.body.appendChild(ov);
-  const steps=[
-    "Moment… du hast 'Nein' tatsächlich erwischt.",
-    "Das hätte eigentlich gar nicht passieren dürfen.",
-    "FEHLER 404 · Option 'Nein' nicht gefunden.",
-    "System korrigiert deine Eingabe…",
-    "Antwort wird gesetzt auf:  Ja."
-  ];
+  ov.style.cssText='position:fixed;inset:0;z-index:8;display:grid;place-items:center;background:rgba(8,8,14,.55);padding:20px';
+  const win=document.createElement('div');
+  win.style.cssText='width:min(390px,92vw);background:#2D2D2D;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.6);font-family:var(--mono)';
+  win.innerHTML=
+    '<div style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,var(--signal),var(--gelb));color:#202020;padding:9px 12px;font-weight:800;font-size:.82rem">'
+    +'<span>Nein.exe</span><span id="dx" style="cursor:pointer;padding:0 6px">×</span></div>'
+    +'<div style="padding:20px 18px 22px;color:var(--txt)">'
+    +'<p style="font-size:.9rem;line-height:1.55">⚠ Ein Problem hat dazu geführt, dass <b>Nein</b> nicht mehr korrekt funktioniert. '
+    +'Windows sucht nach einer Lösung… gefunden wurde nur <b>Ja</b>.</p>'
+    +'<div style="display:flex;justify-content:flex-end;margin-top:20px">'
+    +'<button id="dja" style="font-family:\'Inter\';font-weight:800;cursor:pointer;border:none;color:#202020;background:var(--gelb);padding:10px 22px;border-radius:9px">Trotzdem Ja</button>'
+    +'</div></div>';
+  ov.appendChild(win); document.body.appendChild(ov);
+  const close=()=>{ ov.remove(); dialogOpen=false; };
+  win.querySelector('#dx').addEventListener('click',()=>{ close(); toast("Weggeklickt. Der Knopf flieht einfach weiter.", window.innerWidth/2, window.innerHeight*0.4); blip(200,.1,'square',.03); });
+  win.querySelector('#dja').addEventListener('click',()=>{ close(); ac(); fanfare(); startParty(); });
+}
+
+/* Polyglott: der Knopf sagt hektisch in vielen Sprachen "Nein" */
+function polyglott(){
+  if(swapped) return;
+  const NOS=["Nein","No","Non","Nope","Nyet","Iie","Nej","Nee","Ei","Não","…nein"];
+  let i=0; const iv=setInterval(()=>{
+    if(swapped || surrendered){ clearInterval(iv); return; }
+    nein.textContent=NOS[i%NOS.length]; blip(300+(i%6)*45,.05,'square',.022); i++;
+    if(i>=14){ clearInterval(iv); nein.textContent=NEIN_LABELS[Math.min(dodges,NEIN_LABELS.length-1)]; }
+  }, 95);
+}
+
+/* Fake-Countdown, der auf "Ja" umkippt statt zu akzeptieren */
+function countdownFake(x,y){
+  if(cdBusy) return; cdBusy=true;
+  const seq=["Nein akzeptiert in 3…","2…","1…","…Ja. 💛"];
   let i=0;
-  (function next(){
-    if(i<steps.length){
-      line.textContent=steps[i];
-      blip(300+i*70,.14,'square',.04);
-      const last=(i===steps.length-1);
-      i++;
-      setTimeout(next, last?1500:1100);
-    } else { ov.remove(); fanfare(); startParty(); }
+  (function step(){
+    if(i<seq.length){ toast(seq[i], x, y-30); blip(360+i*80,.12,'square',.035);
+      const last=(i===seq.length-1); i++; setTimeout(step, last?700:520); }
+    else cdBusy=false;
   })();
+}
+
+/* Bait & Switch: Ja und Nein tauschen kurz die Beschriftung */
+function baitSwitch(){
+  if(swapped) return; swapped=true;
+  nein.textContent='Ja'; ja.textContent='Nein';
+  toast("Moment — welcher war nochmal welcher?", window.innerWidth/2, window.innerHeight*0.4);
+  blip(500,.12,'triangle',.04);
+  setTimeout(()=>{ swapped=false;
+    nein.textContent=NEIN_LABELS[Math.min(dodges,NEIN_LABELS.length-1)];
+    let jl="Ja"; JA_LABELS.forEach(p=>{if(dodges>=p[0])jl=p[1];}); ja.textContent=jl;
+  }, 1700);
+}
+
+/* Button-Hydra: zwei Schein-Neins stieben auseinander und lösen sich auf */
+function hydra(){
+  if(decoys.length>4) return;
+  toast("Er teilt sich! Wie ein Peeper-Schwarm.", window.innerWidth/2, window.innerHeight*0.4);
+  const w=110, h=44, m=20;
+  for(let k=0;k<2;k++){
+    const d=document.createElement('button'); d.className='decoy'; d.type='button';
+    d.textContent=['Nein','Nö','Niemals','doch nicht'][Math.floor(Math.random()*4)];
+    d.style.left=(m+Math.random()*(window.innerWidth-w-2*m))+'px';
+    d.style.top =(m+Math.random()*(window.innerHeight-h-2*m))+'px';
+    d.addEventListener('click',ev=>{ ev.preventDefault();
+      toast("Auch nur eine Fata Morgana.", parseInt(d.style.left)+w/2, parseInt(d.style.top));
+      blip(200,.1,'square',.03); killDecoy(d); });
+    document.body.appendChild(d); decoys.push(d);
+    setTimeout(()=>killDecoy(d), 2200+Math.random()*600);
+  }
+  blip(300,.14,'triangle',.04);
+}
+function killDecoy(d){ const i=decoys.indexOf(d); if(i>=0) decoys.splice(i,1);
+  if(d.parentNode){ d.style.opacity='0'; d.style.transform='scale(.4)'; setTimeout(()=>d.remove(),200); } }
+
+/* ───────── Payoff: Nein kapituliert & watschelt zu Ja ───────── */
+function surrender(){
+  if(surrendered) return; surrendered=true; dodgingEnabled=false; swapped=false; cdBusy=false;
+  ac(); decoys.slice().forEach(killDecoy);
+  goLoose();                                   // sicherstellen: frei positioniert
+  nein.textContent="ok, ok… ich will auch nicht mehr";
+  nein.style.transform='';
+  toast("…ganz ehrlich, Subnautica klingt super.", window.innerWidth/2, window.innerHeight*0.35);
+  const goParty=()=>{ nein.style.display='none'; fanfare(); startParty(); };
+  if(reduce){ setTimeout(goParty, 600); return; }
+  const jr=ja.getBoundingClientRect();
+  const jaS=Math.min(3, jaScale*1.15);
+  ja.style.transform='scale('+jaS+')';
+  nein.classList.add('waddle');
+  const TRAVEL=2400;                                    // deutlich langsamer rüberwatscheln
+  nein.style.transition='left '+TRAVEL+'ms ease-in-out, top '+TRAVEL+'ms ease-in-out';
+  requestAnimationFrame(()=>{
+    nein.style.left=(jr.left+jr.width/2 - nein.offsetWidth/2)+'px';
+    nein.style.top =(jr.top +jr.height/2 - nein.offsetHeight/2)+'px';
+  });
+  // Ankommen → sichtbar auf den Ja-Knopf drücken
+  setTimeout(()=>{
+    nein.classList.remove('waddle');
+    ja.style.transition='transform .12s ease-in';
+    ja.style.transform='scale('+(jaS*0.8)+')';          // Ja wird eingedrückt
+    nein.style.transition='transform .3s ease, opacity .3s';
+    nein.style.transform='scale(.12)'; nein.style.opacity='0';   // Nein verschmilzt hinein
+    blip(140,.2,'square',.055);                         // "thunk"
+    setTimeout(()=>{ ja.style.transition='transform .34s cubic-bezier(.34,1.56,.64,1)';
+      ja.style.transform='scale('+jaS+')'; }, 140);     // Ja federt zurück
+    setTimeout(goParty, 560);
+  }, TRAVEL);
 }
 
 /* ───────── Toast ───────── */
