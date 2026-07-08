@@ -10,26 +10,27 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0a12; --panel:rgba(18,18,28,.66); --line:rgba(255,255,255,.08);
-    --gelb:#FFE44E; --gelb-soft:rgba(255,228,78,.14);
-    --signal:#54E6C5; --signal-soft:rgba(84,230,197,.12);
-    --txt:#EDEDF4; --muted:rgba(237,237,244,.55); --no:#FF6B7A;
+    /* Mortys Welt CI: Gelb+Orange Kernfarben, Blau nur Tiefe */
+    --bg:#202020; --panel:rgba(45,45,45,.58); --line:rgba(255,255,255,.10);
+    --gelb:#F5C07C; --gelb-soft:rgba(245,192,124,.14);
+    --signal:#F09346; --signal-soft:rgba(240,147,70,.14);
+    --txt:#F0F0F0; --muted:rgba(240,240,240,.55); --no:#FF6B7A;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{
     font-family:'Inter',system-ui,sans-serif;color:var(--txt);
     background:
-      radial-gradient(1200px 760px at 16% -12%, rgba(255,228,78,.07), transparent 58%),
-      radial-gradient(1000px 680px at 90% 112%, rgba(84,230,197,.09), transparent 60%),
+      radial-gradient(1200px 760px at 16% -12%, rgba(245,192,124,.07), transparent 58%),
+      radial-gradient(1000px 680px at 90% 112%, rgba(87,115,153,.14), transparent 60%),
       var(--bg);
     min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
     padding:32px 18px;overflow:hidden;position:relative;
   }
   body.party{animation:bgparty 2.2s linear infinite}
   @keyframes bgparty{
-    0%{background-color:#0a0a12}25%{background-color:#15122a}
-    50%{background-color:#0a1f1c}75%{background-color:#241a05}100%{background-color:#0a0a12}}
+    0%{background-color:#202020}25%{background-color:#2b2416}
+    50%{background-color:#1e2733}75%{background-color:#2d2216}100%{background-color:#202020}}
 
   .starfield{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
   .starfield i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.7;animation:tw 4s ease-in-out infinite}
@@ -58,8 +59,8 @@
   button{font-family:'Inter';font-weight:800;cursor:pointer;border:none;transition:transform .12s}
 
   #ja{
-    color:#15130a;background:var(--gelb);font-size:1.25rem;padding:16px 40px;border-radius:15px;
-    box-shadow:0 10px 26px rgba(255,228,78,.30);transform-origin:center;will-change:transform;
+    color:#202020;background:var(--gelb);font-size:1.25rem;padding:16px 40px;border-radius:15px;
+    box-shadow:0 10px 26px rgba(245,192,124,.30);transform-origin:center;will-change:transform;
     transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,padding .25s,font-size .25s;
   }
   #ja:hover{transform:scale(1.06)}
@@ -98,7 +99,7 @@
     padding:26px 22px;backdrop-filter:blur(8px)}
   .decode-label{font-family:var(--mono);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
   #decoded{font-family:var(--mono);font-weight:700;font-size:clamp(1.5rem,5.5vw,2.6rem);letter-spacing:.14em;
-    color:var(--signal);margin-top:14px;min-height:1.4em;text-shadow:0 0 24px rgba(84,230,197,.4)}
+    color:var(--signal);margin-top:14px;min-height:1.4em;text-shadow:0 0 24px rgba(240,147,70,.4)}
   .gift{margin-top:18px;font-size:1.05rem;color:var(--txt);opacity:0;transition:opacity .8s}
   .gift.show{opacity:1}
 
@@ -310,7 +311,7 @@ function size(){cv.width=innerWidth;cv.height=innerHeight;} size(); addEventList
 let parts=[], raf=null;
 function burst(){
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const cols=['#FFE44E','#54E6C5','#ffffff','#FF6B7A','#7c6cff'];
+  const cols=['#F5C07C','#F09346','#F0F0F0','#577399','#ffffff'];
   for(let i=0;i<220;i++) parts.push({
     x:innerWidth/2,y:innerHeight*0.42,
     vx:(Math.random()-.5)*16, vy:Math.random()*-14-4,

@@ -18,11 +18,11 @@
         .wave {
             display: block; width: 100%; height: 56px;
             border-bottom: 1px solid var(--card-border);
-            background: rgba(140, 28, 19, 0.05);
+            background: rgba(245, 192, 124, 0.05);
         }
 
         .slug {
-            font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+            font-family: 'JetBrains Mono', ui-monospace, "Cascadia Code", Consolas, monospace;
             font-size: .74rem; letter-spacing: .01em; color: var(--text-muted);
             margin: 22px 0 14px;
         }
@@ -30,7 +30,7 @@
 
         .signal-title, .reveal-title {
             font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 900;
-            letter-spacing: -.04em; line-height: 1; color: #e7d7c1; margin-bottom: 16px;
+            letter-spacing: -.04em; line-height: 1; color: #F5C07C; margin-bottom: 16px;
         }
         .signal-title { font-feature-settings: "tnum"; }
         .signal-help { color: var(--text-muted); font-size: .9rem; margin-bottom: 2px; }
@@ -39,16 +39,16 @@
         #code {
             flex: 1; min-width: 200px; padding: 14px 16px; border-radius: 12px;
             background: var(--btn-bg); border: 1px solid var(--btn-border);
-            color: #fff; font: inherit; font-size: 1rem; letter-spacing: .04em; text-align: center;
+            color: #F0F0F0; font: inherit; font-size: 1rem; letter-spacing: .04em; text-align: center;
             caret-color: var(--accent); transition: border-color .2s, box-shadow .2s;
         }
         #code:focus { outline: none; border-color: var(--btn-hover-border); box-shadow: 0 0 22px var(--accent-glow); }
         #send {
-            padding: 14px 24px; border-radius: 12px; border: 1px solid rgba(140,28,19,.5);
-            background: rgba(140,28,19,.22); color: #e7d7c1; font: inherit; font-weight: 700;
+            padding: 14px 24px; border-radius: 12px; border: 1px solid rgba(245,192,124,.5);
+            background: rgba(245,192,124,.18); color: #F5C07C; font: inherit; font-weight: 700;
             cursor: pointer; transition: background .2s, transform .2s;
         }
-        #send:hover { background: rgba(140,28,19,.34); transform: translateY(-2px); }
+        #send:hover { background: rgba(245,192,124,.30); transform: translateY(-2px); }
         #send:disabled { opacity: .65; cursor: default; transform: none; }
 
         .signal-error { color: #ff6b6b; font-size: .85rem; margin-top: 16px; min-height: 1em; letter-spacing: .01em; }
@@ -219,7 +219,7 @@
         wctx.clearRect(0, 0, w, h);
         const amp = (waveState === "decoding" ? 0.34 : 0.16) * h * (1 - lockMix) + 0.5 * lockMix;
         const speed = waveState === "decoding" ? 0.009 : 0.004;
-        const color = waveState === "error" ? "rgba(255,107,107,0.85)" : "rgba(231,215,193,0.8)";
+        const color = waveState === "error" ? "rgba(255,107,107,0.85)" : "rgba(245,192,124,0.8)";
         // Grundlinie
         wctx.strokeStyle = color; wctx.lineWidth = 1.4 * dpr; wctx.beginPath();
         for (let x = 0; x <= w; x += 2 * dpr) {
@@ -233,7 +233,7 @@
         if (!reduce && lockMix < 1) {
             const sx = ((t * 0.08 * dpr) % w);
             const g = wctx.createRadialGradient(sx, mid, 0, sx, mid, 26 * dpr);
-            g.addColorStop(0, "rgba(140,28,19,0.55)"); g.addColorStop(1, "rgba(140,28,19,0)");
+            g.addColorStop(0, "rgba(240,147,70,0.55)"); g.addColorStop(1, "rgba(240,147,70,0)");
             wctx.fillStyle = g; wctx.fillRect(sx - 26 * dpr, 0, 52 * dpr, h);
         }
         if (waveState === "locked" && lockMix < 1) lockMix = Math.min(1, lockMix + 0.04);
@@ -247,7 +247,7 @@
         const cv = $("confetti"), ctx = cv.getContext("2d");
         const d = Math.min(devicePixelRatio || 1, 2);
         cv.width = innerWidth * d; cv.height = innerHeight * d;
-        const colors = palette || ["#8c1c13", "#e7d7c1", "#ffffff", "#b5342a"];
+        const colors = palette || ["#F5C07C", "#F09346", "#F0F0F0", "#577399"];
         const cx = innerWidth * d / 2, cy = innerHeight * d * 0.32;
         const P = Array.from({ length: 150 }, () => {
             const a = Math.random() * Math.PI * 2, sp = (4 + Math.random() * 9) * d;
@@ -285,7 +285,7 @@
             $("title").textContent = "hallo, henne";
             statusEl.textContent = "» fan-modus";
             showMsg("Du tippst deinen eigenen Namen? Ikonisch. Das Signal will trotzdem eine Nachricht, kein Autogramm.", true);
-            fireConfetti(["#7bd88f", "#e7d7c1", "#ffffff"]);
+            fireConfetti(["#7bd88f", "#F5C07C", "#ffffff"]);
             setTimeout(() => scramble($("title"), "Signal zurücksenden", 700), 2800);
         },
         henne: () => showMsg("Ich weiß, wer du bist, Henne. Das Signal auch. Trotzdem: die ganze Nachricht.", true),
@@ -460,8 +460,8 @@
     scramble($("title"), "Signal zurücksenden", 1200);
 
     /* ── Gruß an die Konsolen-Hacker (MortysTerminal lässt grüßen) ── */
-    console.log("%c» Konsole offen, Erwartungen niedrig.", "color:#e7d7c1;font-size:14px;font-weight:700");
-    console.log("%cHier gibt es keinen Code zu finden, nur AES-256-GCM und meinen Sarkasmus. sudo geh zurueck in den Chat. - M.", "color:#8c1c13");
+    console.log("%c» Konsole offen, Erwartungen niedrig.", "color:#F5C07C;font-size:14px;font-weight:700");
+    console.log("%cHier gibt es keinen Code zu finden, nur AES-256-GCM und meinen Sarkasmus. sudo geh zurueck in den Chat. - M.", "color:#F09346");
     </script>
 </body>
 </html>
