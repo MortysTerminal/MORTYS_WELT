@@ -51,6 +51,19 @@
         #send:hover { background: rgba(245,192,124,.30); transform: translateY(-2px); }
         #send:disabled { opacity: .65; cursor: default; transform: none; }
 
+        /* Zweiter Faktor: 7 Ziffern (#code) — Abstand — Buchstabe (#letter) */
+        #sep {
+            display: flex; align-items: center; margin: 0 4px;
+            color: var(--accent-2); font-size: 1.15rem; opacity: .8;
+        }
+        #letter {
+            flex: 0 0 auto; width: 60px; padding: 14px 8px; border-radius: 12px;
+            background: var(--btn-bg); border: 1px solid rgba(240,147,70,.45);
+            color: #F0F0F0; font: inherit; font-size: 1rem; letter-spacing: .04em; text-align: center;
+            caret-color: var(--accent-2); transition: border-color .2s, box-shadow .2s;
+        }
+        #letter:focus { outline: none; border-color: rgba(240,147,70,.7); box-shadow: 0 0 22px rgba(240,147,70,.24); }
+
         .signal-error { color: #ff6b6b; font-size: .85rem; margin-top: 16px; min-height: 1em; letter-spacing: .01em; }
         .signal-error.egg { color: var(--accent-warm); }
 
@@ -134,6 +147,10 @@
                     <input id="code" type="text" inputmode="text" autocomplete="off"
                            autocapitalize="off" spellcheck="false" placeholder="· · · · ·"
                            aria-label="Entschlüsselte Nachricht">
+                    <span id="sep" aria-hidden="true" style="display:none">✎</span>
+                    <input id="letter" type="password" inputmode="text" autocomplete="off"
+                           autocapitalize="characters" spellcheck="false" maxlength="1"
+                           placeholder="●" aria-label="Aufgemalter Buchstabe vom Paket" style="display:none">
                     <button id="send" type="submit">Senden</button>
                 </form>
                 <p class="signal-error" id="err" role="alert"></p>
@@ -149,22 +166,24 @@
     //  Reveal-Inhalt (inkl. Video) liegt NUR als AES-256-GCM-Chiffretext vor.
     //  Schlüssel = eingegebene Nachricht. Falscher Code -> Entschlüsselung
     //  scheitert. Im Quelltext/Repo steht nichts Lesbares.
-    //  Neu verschlüsseln (echte Video-ID): website-build/finale-verschluesseln.html
+    //  Neu verschlüsseln (echte Video-ID): source/finale-verschluesseln.html  (lokal, nicht im Repo)
     // =====================================================================
     // Zwei-Faktor:
-    //  VERIFY = encrypt("OK", Schlüssel = Nachricht)        → prüft Schritt 1
-    //  REVEAL = encrypt(Inhalt, Schlüssel = Nachricht+PIN)  → braucht Umschlag-PIN
-    // Die 4 Ziffern stehen nirgends im Klartext.
-    const V_SALT = "dggRM4f+GP2LRUe1rMx69A==";
-    const V_IV   = "S1PLNA5h5TNO//Mk";
-    const V_CT   = "OynR8YrZsGZhNSI4xXjcfrbK";
-    const R_SALT = "m39blm9EeX9FOho/MR+Jcg==";
-    const R_IV   = "FLugUC7wp632F2F9";
-    const R_CT   = "KCk1ooit7G7nvhofvJTMXIcAluLnt2PNP7LuqD6kAGfesk5aESuAu4jWLePFeL+K7MyrEEFLVYPUm8oT3s7yphwPZEz8syEZ7JfiGIZlkg9xAnNGOcWqqUikKr1TTWt1Va1phoEMUbiXGodw6LTcR9zx87/5TFscIp1fBEWcliok6jOtZmgLazGzKZP/SldhRJCOnieR+V88ILDSDpRL3c0iyU3qiG548ebDt9qybFeihPcqI7hVPR/+CEGv4Vlbgq4kbZLQzAOYLY57AhYe4j0mIsIVEGhAZtlv/XjyOKV224eCNoHYWOoACCrq3wrZmmC6gWdO2ovoXow09DTjCFMC1J0Iaywy0g4BJXOH3kkFwQuvN+FFfZKBL4sf/Wlcb0iELtECIf0jB8H/5ujJo1tRmjQVZd+W649n9bg8MYiSKXceUBXNlniJSe6pMSZ3pagKd8niIc/FuehBRZRmErhccoUvV02gqsWnVTmUWsJAGWTZFQuhS1ccSJsaT5+vrTRr1xv5d0DUgrGChkBCtlS0TARb1V2gpqCfEgXJr/xcx2J4S+7gjscyxYF8smfeOH85US77Ii0WIIS//H9+RYQ+kCfxb73uTfaKIrRH2dOENL0C6BzsDHyaUp6ZCePEpdooj6JHXRf/D1yaS0Y5y/tKQeKlPD9JX+g6foW9oy6MSkg=";
+    //  VERIFY = encrypt("OK", Schlüssel = Nachricht)                       → prüft Schritt 1
+    //  REVEAL = encrypt(Inhalt, Schlüssel = Nachricht + 7 Ziffern + Buchstabe) → braucht Sendungsnr. + Edding-Buchstabe
+    // Die 7 Ziffern der Sendungsnummer und der aufgemalte Buchstabe stehen nirgends im Klartext.
+    const V_SALT = "mI2+3ZkFXKGoFPhFJ8o+Cw==";
+    const V_IV   = "8uDhssUdRqJ8KwDS";
+    const V_CT   = "CPCMhrYXoJLHrmrManKX64cO";
+    const R_SALT = "TpH4mNDMpph8EJvQVxzxSA==";
+    const R_IV   = "GAjE/fGbvFMATS6c";
+    const R_CT   = "SDYFHpGMnvR/Hnub55fXT0qrf9Fi5f2WbzGGGizU3wboLvqdgd0ktpXEPr+dhoyxI02Up2L5OuqVc2ASw/N1volyomz5wMGdTsgW6E7W6vnTHjmzCs+1y6wvwhQqD++7eAb0/TRYomJS5hMaYtepawj5zFyAW5F4y7UHnEkkTeBwd4k+wVgRXijzoWGYS70KH6r3GAnQtp4raE0BrT2cg3BZsbcRttjO4+lutxlI6N9WsOVm0qcXs3Cmkvri439TTJ8PXLqbRQKX8sSE5XsjkhX88Y13Sc4moy3hG7isJPYFKjPF/gx01D5zJcvB/xuj4ob2jKgwXKx9H7+Cu52ukrqOMI3+2J2OG41jrdFGx8Z4mXOnn/lJ/XEqgl6p1cpYC/DwGac8iwuWbGFCYAsadZn8DxXeJfNhqBZVRmFobYfxIOXWcJ+xnAhbSi9hZG7I4+4MhB7xWz5W2NRJYF0sJPbxrQqc/MH+Rpcsa4IvDqhx4iEuYo+fKeL0GZsR0NqYZTVgZkWC1G08KsOpc3OYAxGc2miBe3S/A0ob9jNLb2NlA38llsr8rApOMcrK9MZ/jqi3QutQ9MDsVD1hjbajW5fuNAOfytFUqj7kXKzMSFj5miktKQ==";
+
 
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const $ = (id) => document.getElementById(id);
     const view = $("view"), card = $("card"), err = $("err"), send = $("send"), code = $("code");
+    const letterEl = $("letter"), sepEl = $("sep");
     const statusEl = $("status");
     const SLUG_IDLE = '» eingehende übertragung · für <b>henne</b>';
 
@@ -186,7 +205,7 @@
         return new TextDecoder().decode(pt);
     }
     const verifyMessage = (norm) => decryptWith(norm, V_SALT, V_IV, V_CT);        // wirft, wenn Nachricht falsch
-    const decryptReveal = (norm, pin) => decryptWith(norm + pin, R_SALT, R_IV, R_CT); // braucht PIN
+    const decryptReveal = (norm, second) => decryptWith(norm + second, R_SALT, R_IV, R_CT); // braucht 7 Ziffern + Buchstabe
 
     /* ── Decoder-Scramble (mysteriös/spielerisch) ── */
     const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*<>/\\▮▯";
@@ -365,11 +384,12 @@
 
     function enterPinPhase() {
         phase = "pin"; waveState = "idle"; statusEl.textContent = "» identität?";
-        $("help").textContent = "Glückwunsch, der Code war richtig. Aber bist du wirklich Henne - oder nur ein Triebtäter? Verifiziere dich, indem du die letzten vier Ziffern der Sendungsnummer vom Paket eingibst.";
-        code.value = ""; code.placeholder = "● ● ● ●";
+        $("help").textContent = "Glückwunsch, der Code war richtig. Aber bist du wirklich Henne - oder nur ein Triebtäter? Gib die letzten sieben Ziffern der Sendungsnummer vom Paket ein - und dahinter den Buchstaben, den ich mit Edding daneben gemalt habe.";
+        code.value = ""; code.placeholder = "● ● ● ● ● ● ●";
         code.type = "password";                                  // maskiert → stream-sicher
-        code.setAttribute("inputmode", "numeric"); code.setAttribute("maxlength", "4");
+        code.setAttribute("inputmode", "numeric"); code.setAttribute("maxlength", "7");
         code.setAttribute("autocomplete", "off");
+        letterEl.value = ""; letterEl.style.display = ""; sepEl.style.display = "";   // Buchstabenfeld zeigen
         send.textContent = "Verifizieren"; send.disabled = false;
         scramble($("title"), "Verifizierung", 700); code.focus();
     }
@@ -416,22 +436,25 @@
             return;
         }
 
-        // phase === "pin"
-        const pin = (code.value.match(/\d/g) || []).join("");
-        if (pin.length !== 4) { showMsg("Vier Ziffern - die letzten vier der Sendungsnummer auf dem Paket.", true); jiggle(); return; }
+        // phase === "pin": 7 Ziffern (Sendungsnummer) + 1 Buchstabe (Edding)
+        const digits = (code.value.match(/\d/g) || []).join("");
+        const letter = ((letterEl.value.match(/[a-z]/i) || [""])[0]).toLowerCase();
+        if (digits.length !== 7 || !letter) {
+            showMsg("Sieben Ziffern der Sendungsnummer - und der eine Buchstabe, den ich draufgemalt habe.", true); jiggle(); return;
+        }
         send.disabled = true; send.textContent = "…";
         waveState = "decoding"; statusEl.textContent = "» verifiziere…";
         try {
-            const html = await decryptReveal(savedNorm, pin);   // braucht Nachricht + PIN
+            const html = await decryptReveal(savedNorm, digits + letter);   // Schlüssel = Nachricht + Ziffern + Buchstabe
             await doReveal(html);
         } catch (_) {
             await wait(reduce ? 0 : 350);
             pinTries++;
             const pl = [
                 "Falscher Code. Verdächtig.",
-                "Immer noch falsch. Ein echte Henne hätte das gewusst.",
+                "Immer noch falsch. Eine echte Henne hätte das gewusst.",
                 "Nope. Langsam glaube ich, du bist wirklich ein Triebtäter.",
-                "Die letzten vier Ziffern der Sendungsnummer stehen auf dem Paket. Du schaffst das."
+                "Die letzten sieben Ziffern der Sendungsnummer plus der aufgemalte Buchstabe - beides steht auf dem Paket. Du schaffst das."
             ];
             waveState = "error"; statusEl.textContent = "» identität abgelehnt";
             showMsg(pl[Math.min(pinTries - 1, pl.length - 1)], false);
