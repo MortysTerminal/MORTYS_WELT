@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Only Fans | Mortys Welt</title>
+    <link rel="icon" type="image/x-icon" href="../logo.png">
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+    <noscript>
+        <div class="noscript-fallback">
+            <p class="noscript-title">ONLY FANS</p>
+            <p class="noscript-sub">Bitte aktiviere JavaScript.</p>
+            <p>Ohne Skript zeigt dir diese Seite leider gar nichts. Wahrscheinlich zu deinem Glück.</p>
+        </div>
+    </noscript>
+
+    <main id="main">
+        <!-- Stage 1: Altersabfrage -->
+        <section id="stage-1" class="stage stage-gate" tabindex="-1" aria-labelledby="stage-1-title">
+            <div class="glass-panel gate-panel">
+                <h2 id="stage-1-title" tabindex="-1" data-focus-target>Bist du volljährig?</h2>
+                <p>Diese Seite enthält Inhalte, die nicht für jeden bestimmt sind.</p>
+                <div class="gate-actions">
+                    <button type="button" id="gate-yes">Ja</button>
+                    <button type="button" id="gate-no">Nein, ich bin Lalafell und sehe nur so aus</button>
+                </div>
+                <p id="gate-message" class="gate-message" aria-live="polite"></p>
+            </div>
+        </section>
+
+        <!-- Stage 2: Verifizierung -->
+        <section id="stage-2" class="stage stage-verify" tabindex="-1" aria-label="Verifizierung" hidden>
+            <div class="verify-panel">
+                <p id="verify-status" class="verify-status" tabindex="-1" data-focus-target aria-live="polite">Prüfe Altersnachweis</p>
+                <div id="verify-track" class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="verify-status">
+                    <div id="verify-bar" class="progress-bar"></div>
+                </div>
+                <p id="verify-percent" class="verify-percent" aria-hidden="true">0%</p>
+            </div>
+        </section>
+
+        <!-- Stage 3: Reveal -->
+        <section id="stage-3" class="stage stage-reveal" tabindex="-1" aria-labelledby="stage-3-title" hidden>
+            <div class="reveal-inner">
+                <h1 id="stage-3-title" tabindex="-1" data-focus-target class="reveal-title">ONLY FANS</h1>
+                <p class="reveal-sub">100% echt. 100% ungefiltert. Nur für dich freigeschaltet.</p>
+                <button type="button" id="reveal-next">Weiter zur Galerie</button>
+            </div>
+        </section>
+
+        <!-- Stage 4: Hürdenlauf -->
+        <section id="stage-4" class="stage stage-obstacle" tabindex="-1" aria-labelledby="stage-4-title" hidden>
+            <h2 id="stage-4-title" tabindex="-1" data-focus-target>Nur noch ein Klick.</h2>
+            <p class="obstacle-sub">Theoretisch. Der Button sieht das leider anders.</p>
+            <p id="obstacle-timer" class="obstacle-timer" aria-live="polite"></p>
+
+            <div id="obstacle-field" class="obstacle-field">
+                <button type="button" id="obstacle-decoy-1" class="obstacle-btn obstacle-decoy">Weiter zur Galerie</button>
+                <button type="button" id="obstacle-decoy-2" class="obstacle-btn obstacle-decoy">Hier klicken</button>
+                <button type="button" id="obstacle-trap" class="obstacle-btn obstacle-trap">NICHT klicken</button>
+                <button type="button" id="obstacle-real" class="obstacle-btn obstacle-real" disabled>weiter</button>
+            </div>
+
+            <p id="obstacle-message" class="obstacle-message" aria-live="polite"></p>
+        </section>
+
+        <!-- Stage 5: Galerie -->
+        <section id="stage-5" class="stage stage-gallery" tabindex="-1" aria-labelledby="stage-5-title" hidden>
+            <h2 id="stage-5-title" tabindex="-1" data-focus-target>Die Kollektion</h2>
+            <p class="gallery-sub">Alles eigene Hardware. Ungeschnitten, kein Filter.</p>
+            <div id="gallery-grid" class="gallery-grid"></div>
+            <button type="button" id="gallery-next" class="gallery-cta">Mehr sehen</button>
+        </section>
+
+        <!-- Stage 6: Abostufen -->
+        <section id="stage-6" class="stage stage-tiers" tabindex="-1" aria-labelledby="stage-6-title" hidden>
+            <h2 id="stage-6-title" tabindex="-1" data-focus-target>Abo-Stufen</h2>
+            <p class="tiers-sub">Wähle deinen Luftstrom. Jederzeit kündbar (theoretisch).</p>
+
+            <div class="tiers-grid">
+                <article class="tier-card glass-panel">
+                    <h3 class="tier-name">Basis-Luftstrom</h3>
+                    <p class="tier-price">0&nbsp;€<span>/Monat</span></p>
+                    <ul class="tier-features">
+                        <li>Verpixelte Vorschaubilder</li>
+                        <li>Grundlegende Spezifikationen</li>
+                        <li>Werbung von Radiatorherstellern</li>
+                    </ul>
+                    <button type="button" class="tier-cta" data-tier="basis">Kostenlos schnuppern</button>
+                </article>
+
+                <article class="tier-card glass-panel tier-featured">
+                    <p class="tier-badge">Beliebt</p>
+                    <h3 class="tier-name">Silent Flow</h3>
+                    <p class="tier-price">4,99&nbsp;€<span>/Monat</span></p>
+                    <ul class="tier-features">
+                        <li>Alle Profile in voller Auflösung</li>
+                        <li>Exklusive Drehzahlkurven</li>
+                        <li>Wöchentliches Staubfrei-Update</li>
+                    </ul>
+                    <button type="button" class="tier-cta" data-tier="silent">Jetzt abonnieren</button>
+                </article>
+
+                <article class="tier-card glass-panel">
+                    <h3 class="tier-name">Full Blast</h3>
+                    <p class="tier-price">9,99&nbsp;€<span>/Monat</span></p>
+                    <ul class="tier-features">
+                        <li>4K-Nahaufnahmen der Lagerbuchse</li>
+                        <li>Persönliche Drehzahlwünsche</li>
+                        <li>Direktnachrichten mit dem Radiator</li>
+                    </ul>
+                    <button type="button" class="tier-cta" data-tier="full">Voll reingehen</button>
+                </article>
+            </div>
+
+            <p id="tier-status" class="tier-status" aria-live="polite"></p>
+        </section>
+
+        <!-- Stage 7: Abgang -->
+        <section id="stage-7" class="stage stage-outro" tabindex="-1" aria-labelledby="stage-7-title" hidden>
+            <div class="outro-inner glass-panel">
+                <h2 id="stage-7-title" tabindex="-1" data-focus-target>Erwischt.</h2>
+                <p class="outro-lead">Es gibt kein echtes Only Fans. Es gab nie eins. Es wird nie eins geben.</p>
+                <p class="outro-body">Das hier war die ganze Zeit ein Katalog für PC-Lüfter. Schick das gerne deiner Chat-Community, ich freu mich drüber.</p>
+                <p class="outro-body">Für echten Content bin ich hier unterwegs:</p>
+                <nav class="outro-links" aria-label="Echte Links von Morty">
+                    <a href="https://www.twitch.tv/mortys_welt" target="_blank" rel="noopener noreferrer">Twitch</a>
+                    <a href="https://www.youtube.com/@mortyswelt" target="_blank" rel="noopener noreferrer">YouTube</a>
+                    <a href="https://mortys-welt.com/">Alle Links</a>
+                </nav>
+                <button type="button" id="outro-restart">Nochmal von vorne</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/fans.js"></script>
+    <script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,717 @@
+/* ============================================================
+   Only Fans - style.css
+   No CDN, no external requests. Inter is reused from the
+   existing repo-wide font at /fonts/Inter/ (variable TTF).
+   JetBrains Mono is intentionally not used on this page
+   (decision: keep it to the font already present in the repo).
+   ============================================================ */
+
+/* === FONTS === */
+@font-face {
+    font-family: 'Inter';
+    src: local('Inter Variable'), local('InterVar'), local('Inter'),
+         url('../../fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Inter';
+    src: local('Inter Variable Italic'), local('InterVar-Italic'), local('Inter Italic'),
+         url('../../fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+    font-style: italic;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+/* === DESIGN TOKENS (Mortys Welt CI) === */
+:root {
+    --bg:            #202020;
+    --bg-raised:     #2D2D2D;
+    --text:          #F0F0F0;
+    --text-muted:    #9A9A9A;
+    --accent:        #F5C07C;
+    --accent-2:      #F09346;
+    --font-sans:     'Inter', system-ui, sans-serif;
+    --font-mono:     'Inter', system-ui, sans-serif; /* deviation: no JetBrains Mono file in repo, see header comment */
+    --glass-bg:      rgba(255, 255, 255, 0.04);
+    --glass-border:  rgba(255, 255, 255, 0.10);
+}
+
+/* === RESET === */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html { height: 100%; }
+
+body {
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+}
+
+main {
+    display: block;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* === FOCUS === */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+    outline: none;
+}
+
+/* === GLASS PANEL (shared base for later blocks) === */
+.glass-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+}
+
+/* === STAGES (state machine, content per stage arrives in later blocks) === */
+.stage[hidden] {
+    display: none;
+}
+
+.stage {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 24px;
+}
+
+.stage:focus,
+[data-focus-target]:focus {
+    outline: none;
+}
+
+/* === STUFE 1: ALTERSABFRAGE === */
+.stage-gate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gate-panel {
+    max-width: 420px;
+    width: 100%;
+    padding: 32px 28px;
+    text-align: center;
+}
+
+.gate-panel h2 {
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.gate-panel p {
+    color: var(--text-muted);
+}
+
+.gate-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.gate-actions button {
+    font: inherit;
+    font-weight: 600;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.gate-actions button:hover {
+    border-color: var(--accent);
+}
+
+#gate-yes {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.gate-message {
+    min-height: 1.2em;
+    margin-top: 16px;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* === STUFE 2: VERIFIZIERUNG === */
+.stage-verify {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.verify-panel {
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+}
+
+.verify-status {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    min-height: 1.4em;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+}
+
+.verify-percent {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 12px;
+}
+
+/* === STUFE 3: REVEAL === */
+.stage-reveal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.reveal-inner {
+    animation: revealIn 400ms ease-out;
+}
+
+@keyframes revealIn {
+    from { transform: scale(0.94); }
+    to { transform: scale(1); }
+}
+
+.reveal-title {
+    font-size: clamp(2.5rem, 12vw, 6rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--accent);
+}
+
+.reveal-sub {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 12px;
+}
+
+#reveal-next {
+    font: inherit;
+    font-weight: 600;
+    margin-top: 32px;
+    padding: 14px 28px;
+    border-radius: 12px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+}
+
+#reveal-next:hover {
+    background: var(--glass-bg);
+}
+
+/* === STUFE 4: HÜRDENLAUF === */
+.stage-obstacle {
+    display: block;
+    max-width: 640px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.obstacle-sub {
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.obstacle-timer {
+    min-height: 1.2em;
+    margin-top: 16px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+
+.obstacle-field {
+    position: relative;
+    margin-top: 24px;
+    height: 340px;
+    border: 1px dashed var(--glass-border);
+    border-radius: 16px;
+    background: var(--glass-bg);
+    overflow: hidden;
+}
+
+.obstacle-btn {
+    position: absolute;
+    font: inherit;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: left 220ms ease, top 220ms ease, opacity 200ms ease, font-size 200ms ease, padding 200ms ease;
+}
+
+.obstacle-decoy {
+    border: 1px solid var(--accent);
+    background: var(--bg);
+    color: var(--accent);
+}
+
+.obstacle-decoy:hover {
+    background: var(--glass-bg);
+}
+
+.obstacle-trap {
+    border: 1px solid #e05555;
+    background: var(--bg);
+    color: #e05555;
+}
+
+.obstacle-trap:hover {
+    background: rgba(224, 85, 85, 0.12);
+}
+
+.obstacle-real {
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-muted);
+    opacity: 0.3;
+    font-size: 0.75rem;
+    padding: 6px 12px;
+}
+
+.obstacle-real:disabled {
+    opacity: 0.12;
+    cursor: not-allowed;
+}
+
+.obstacle-real.is-ready {
+    opacity: 0.5;
+}
+
+.obstacle-real.is-settled {
+    opacity: 1;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 14px 28px;
+    animation: obstaclePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes obstaclePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 192, 124, 0.5); }
+    50% { box-shadow: 0 0 0 10px rgba(245, 192, 124, 0); }
+}
+
+.obstacle-message {
+    min-height: 1.2em;
+    margin-top: 16px;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* === STUFE 5: GALERIE === */
+.stage-gallery {
+    display: block;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.gallery-sub {
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 32px;
+}
+
+@media (min-width: 720px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1100px) {
+    .gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.fan-card {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.fan-photo {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: var(--bg-raised);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.fan-photo-placeholder {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.fan-photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.fan-card-body {
+    padding: 20px;
+}
+
+.fan-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    min-height: 1.3em;
+}
+
+.fan-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fan-spec-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.9rem;
+}
+
+.fan-spec-row dt {
+    color: var(--text-muted);
+}
+
+.fan-spec-row dd {
+    font-family: var(--font-mono);
+    text-align: right;
+}
+
+.rating {
+    display: inline-flex;
+    gap: 4px;
+    vertical-align: middle;
+}
+
+.rating-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    background: transparent;
+}
+
+.rating-dot.filled {
+    background: var(--accent);
+}
+
+.placeholder-dash {
+    display: inline-block;
+    width: 14px;
+    height: 2px;
+    background: var(--text-muted);
+    opacity: 0.6;
+    vertical-align: middle;
+}
+
+.fan-comment {
+    margin-top: 14px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.gallery-cta {
+    display: block;
+    font: inherit;
+    font-weight: 600;
+    margin: 40px auto 24px;
+    padding: 14px 28px;
+    border-radius: 12px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+}
+
+.gallery-cta:hover {
+    background: var(--glass-bg);
+}
+
+/* === STUFE 6: ABO-STUFEN === */
+.stage-tiers {
+    display: block;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.tiers-sub {
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.tiers-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 32px;
+    text-align: left;
+}
+
+@media (min-width: 900px) {
+    .tiers-grid {
+        grid-template-columns: repeat(3, 1fr);
+        align-items: start;
+    }
+}
+
+.tier-card {
+    position: relative;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tier-featured {
+    border-color: var(--accent);
+}
+
+.tier-badge {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.tier-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.tier-price {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.tier-price span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.tier-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    flex-grow: 1;
+}
+
+.tier-features li {
+    padding-left: 18px;
+    position: relative;
+}
+
+.tier-features li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.tier-cta {
+    font: inherit;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.tier-cta:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.tier-cta:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.tier-status {
+    min-height: 1.2em;
+    margin-top: 24px;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+
+/* === STUFE 7: ABGANG === */
+.stage-outro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.outro-inner {
+    max-width: 480px;
+    width: 100%;
+    padding: 36px 28px;
+}
+
+.outro-inner h2 {
+    font-size: clamp(1.6rem, 6vw, 2.2rem);
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 16px;
+}
+
+.outro-lead {
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.outro-body {
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.outro-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.outro-links a {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+}
+
+.outro-links a:hover {
+    border-bottom-color: var(--accent);
+}
+
+#outro-restart {
+    font: inherit;
+    font-weight: 600;
+    margin-top: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+}
+
+#outro-restart:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* === NOSCRIPT FALLBACK === */
+.noscript-fallback {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    padding: 24px;
+}
+
+.noscript-title {
+    font-size: clamp(2rem, 10vw, 4rem);
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.noscript-sub {
+    color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}

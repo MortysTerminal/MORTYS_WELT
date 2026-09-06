@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-hidden="true">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E8735D" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#E8735D" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="200" height="200" fill="#242424"/>
+  <circle cx="100" cy="100" r="95" fill="url(#glow)"/>
+  <rect x="6" y="6" width="188" height="188" rx="20" fill="#2D2D2D" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+  <circle cx="26" cy="26" r="7" fill="#242424" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+  <circle cx="174" cy="26" r="7" fill="#242424" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+  <circle cx="26" cy="174" r="7" fill="#242424" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+  <circle cx="174" cy="174" r="7" fill="#242424" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+  <circle cx="100" cy="100" r="72" fill="none" stroke="#E8735D" stroke-width="1.5" opacity="0.35"/>
+  <g fill="#E8735D">
+    <g transform="rotate(0.0 100 100)"><path d="M100,100 C104,86 114,74 130,70 C142,67 152,72 154,82 C150,88 140,87 130,91 C117,96 106,99 100,100 Z" stroke="#1B1B1B" stroke-width="1.5" stroke-linejoin="round" opacity="0.92"/></g>
+    <g transform="rotate(51.4 100 100)"><path d="M100,100 C104,86 114,74 130,70 C142,67 152,72 154,82 C150,88 140,87 130,91 C117,96 106,99 100,100 Z" stroke="#1B1B1B" stroke-width="1.5" stroke-linejoin="round" opacity="0.92"/></g>
+    <g transform="rotate(102.9 100 100)"><path d="M100,100 C104,86 114,74 130,70 C142,67 152,72 154,82 C150,88 140,87 130,91 C117,96 106,99 100,100 Z" stroke="#1B1B1B" stroke-width="1.5" stroke-linejoin="round" opacity="0.92"/></g>
+    <g transform="rotate(154.3 100 100)"><path d="M100,100 C104,86 114,74 130,70 C142,67 152,72 154,82 C150,88 140,87 130,91 C117,96 106,99 100,100 Z" stroke="#1B1B1B" stroke-width="1.5" stroke-linejoin="round" opacity="0.92"/></g>
+    <g transform="rotate(205.7 100 100)"><path d="M100,100 C104,86 114,74 130,70 C142,67 152,72 154,82 C150,88 140,87 130,91 C117,96 106,99 100,100 Z" stroke="#1B1B1B" stroke-width="1.5" stroke-linejoin="round" opacity="0.92"/></g>
+    <g transform="rotate(257.1 100 100)"><path d="M100,100 C104,86 114,74 130,70 C142,67 152,72 154,82 C150,88 140,87 130,91 C117,96 106,99 100,100 Z" stroke="#1B1B1B" stroke-width="1.5" stroke-linejoin="round" opacity="0.92"/></g>
+    <g transform="rotate(308.6 100 100)"><path d="M100,100 C104,86 114,74 130,70 C142,67 152,72 154,82 C150,88 140,87 130,91 C117,96 106,99 100,100 Z" stroke="#1B1B1B" stroke-width="1.5" stroke-linejoin="round" opacity="0.92"/></g>
+  </g>
+  <circle cx="100" cy="100" r="17" fill="#1B1B1B" stroke="#E8735D" stroke-width="2"/>
+  <circle cx="100" cy="100" r="5" fill="#E8735D"/>
+</svg>
