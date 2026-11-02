@@ -26,9 +26,7 @@
 :root {
     --accent:           #F5C07C;   /* Gelb – Kernfarbe, Blickfang/CTA */
     --accent-2:         #F09346;   /* Orange – Kernfarbe, warmer Kontrast */
-    --accent-cool:      #577399;   /* Blau, kühl – Tiefe/Struktur, nie CTA */
-    --accent-warm:      #F5C07C;   /* Warmes Highlight (Name, Titel) = Gelb */
-    --accent-soft:      rgba(245, 192, 124, 0.20);
+    --accent-warm:      #F5C07C;   /* Warmes Highlight = Gelb */
     --accent-glow:      rgba(245, 192, 124, 0.16);
     --accent-hover:     rgba(245, 192, 124, 0.22);
 
@@ -319,7 +317,6 @@ main {
 .link-btn:nth-child(5) { animation-delay: 0.38s; }
 .link-btn:nth-child(6) { animation-delay: 0.43s; }
 .link-btn:nth-child(7) { animation-delay: 0.48s; }
-.link-btn:nth-child(8) { animation-delay: 0.53s; }
 
 @keyframes btnSlide {
     from {
