@@ -1,5 +1,6 @@
 {
   "name": "Mortys Welt",
+  "short_name": "Mortys Welt",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -12,7 +13,7 @@
       "type": "image/png"
     },
     {
-      "src": "/maskable-512.png",
+      "src": "/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

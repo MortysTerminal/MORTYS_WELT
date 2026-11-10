@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Only Fans | Mortys Welt</title>
+    <meta name="description" content="Only Fans von Mortys Welt: zwölf frei erfundene PC-Lüfter stellen sich vor, auf einer Spaßseite ohne Anmeldung, ohne Bezahlung und ohne Datenspeicherung.">
     <link rel="icon" href="../favicon.ico" sizes="48x48">
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="assets/style.css">
@@ -14,19 +15,21 @@
         <div class="noscript-fallback">
             <p class="noscript-title">ONLY FANS</p>
             <p class="noscript-sub">Bitte aktiviere JavaScript.</p>
-            <p>Ohne Skript zeigt dir diese Seite leider gar nichts. Wahrscheinlich zu deinem Glück.</p>
+            <p>Ohne JavaScript bleibt diese Seite leider leer, was für dich vermutlich ein Glück ist.</p>
         </div>
     </noscript>
 
+    <button type="button" id="give-up" class="give-up">Ich gebe auf</button>
+
     <main id="main">
-        <!-- Stage 1: Altersabfrage -->
+        <!-- Stage 1: Temperaturabfrage -->
         <section id="stage-1" class="stage stage-gate" tabindex="-1" aria-labelledby="stage-1-title">
             <div class="glass-panel gate-panel">
-                <h2 id="stage-1-title" tabindex="-1" data-focus-target>Bist du volljährig?</h2>
-                <p>Diese Seite enthält Inhalte, die nicht für jeden bestimmt sind.</p>
+                <h2 id="stage-1-title" tabindex="-1" data-focus-target>Bist du über 18 Grad?</h2>
+                <p>Diese Seite enthält Inhalte, die nur bei Zimmertemperatur angesehen werden dürfen.</p>
                 <div class="gate-actions">
-                    <button type="button" id="gate-yes">Ja</button>
-                    <button type="button" id="gate-no">Nein, ich bin Lalafell und sehe nur so aus</button>
+                    <button type="button" id="gate-yes">Ja, mir ist warm</button>
+                    <button type="button" id="gate-no">Nein, ich friere</button>
                 </div>
                 <p id="gate-message" class="gate-message" aria-live="polite"></p>
             </div>
@@ -35,7 +38,7 @@
         <!-- Stage 2: Verifizierung -->
         <section id="stage-2" class="stage stage-verify" tabindex="-1" aria-label="Verifizierung" hidden>
             <div class="verify-panel">
-                <p id="verify-status" class="verify-status" tabindex="-1" data-focus-target aria-live="polite">Prüfe Altersnachweis</p>
+                <p id="verify-status" class="verify-status" tabindex="-1" data-focus-target aria-live="polite">Messe Raumtemperatur</p>
                 <div id="verify-track" class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="verify-status">
                     <div id="verify-bar" class="progress-bar"></div>
                 </div>
@@ -47,7 +50,8 @@
         <section id="stage-3" class="stage stage-reveal" tabindex="-1" aria-labelledby="stage-3-title" hidden>
             <div class="reveal-inner">
                 <h1 id="stage-3-title" tabindex="-1" data-focus-target class="reveal-title">ONLY FANS</h1>
-                <p class="reveal-sub">100% echt. 100% ungefiltert. Nur für dich freigeschaltet.</p>
+                <p class="reveal-tagline">Hier gibt es ausschließlich Lüfter.</p>
+                <p class="reveal-sub">Ungefiltert und nur für dich freigeschaltet, auch wenn der Ladebalken dabei geschummelt hat.</p>
                 <button type="button" id="reveal-next">Weiter zur Galerie</button>
             </div>
         </section>
@@ -55,7 +59,7 @@
         <!-- Stage 4: Hürdenlauf -->
         <section id="stage-4" class="stage stage-obstacle" tabindex="-1" aria-labelledby="stage-4-title" hidden>
             <h2 id="stage-4-title" tabindex="-1" data-focus-target>Nur noch ein Klick.</h2>
-            <p class="obstacle-sub">Theoretisch. Der Button sieht das leider anders.</p>
+            <p class="obstacle-sub">Das stimmt theoretisch, aber der Button sieht das leider anders.</p>
             <p id="obstacle-timer" class="obstacle-timer" aria-live="polite"></p>
 
             <div id="obstacle-field" class="obstacle-field">
@@ -71,7 +75,22 @@
         <!-- Stage 5: Galerie -->
         <section id="stage-5" class="stage stage-gallery" tabindex="-1" aria-labelledby="stage-5-title" hidden>
             <h2 id="stage-5-title" tabindex="-1" data-focus-target>Die Kollektion</h2>
-            <p class="gallery-sub">Alles eigene Hardware. Ungeschnitten, kein Filter.</p>
+            <p class="gallery-sub">Zwölf Lüfter aus der eigenen Hardwarekiste, ungeschnitten und ohne Filter, und alle frei erfunden.</p>
+
+            <div class="gallery-tools">
+                <p class="air-meter gag-only">So viel Luft wurde heute bewegt: <strong id="air-value">4.711,3</strong> m³</p>
+                <div class="gallery-tool-buttons gag-only">
+                    <button type="button" id="unlock-btn" class="tool-btn">Exklusiven Inhalt freischalten</button>
+                    <button type="button" id="tip-btn" class="tool-btn">Trinkgeld geben</button>
+                </div>
+                <div id="unlock-wrap" class="unlock-wrap gag-only" hidden>
+                    <p id="unlock-label" class="unlock-label">Lade exklusiven Inhalt</p>
+                    <div id="unlock-track" class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="unlock-label">
+                        <div id="unlock-bar" class="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
             <div id="gallery-grid" class="gallery-grid"></div>
             <button type="button" id="gallery-next" class="gallery-cta">Mehr sehen</button>
         </section>
@@ -79,41 +98,40 @@
         <!-- Stage 6: Abostufen -->
         <section id="stage-6" class="stage stage-tiers" tabindex="-1" aria-labelledby="stage-6-title" hidden>
             <h2 id="stage-6-title" tabindex="-1" data-focus-target>Abo-Stufen</h2>
-            <p class="tiers-sub">Wähle deinen Luftstrom. Jederzeit kündbar (theoretisch).</p>
+            <p class="tiers-sub">Wähle deinen Luftstrom, der jederzeit kündbar ist, auch wenn es nichts zu kündigen gibt.</p>
 
             <div class="tiers-grid">
                 <article class="tier-card glass-panel">
-                    <h3 class="tier-name">Basis-Luftstrom</h3>
-                    <p class="tier-price">0&nbsp;€<span>/Monat</span></p>
+                    <h3 class="tier-name">Bronze</h3>
+                    <p class="tier-price">0,00 Euro<span> pro Monat</span></p>
                     <ul class="tier-features">
-                        <li>Verpixelte Vorschaubilder</li>
-                        <li>Grundlegende Spezifikationen</li>
+                        <li>Luft</li>
+                        <li>Ein Lüfter pro Profil</li>
                         <li>Werbung von Radiatorherstellern</li>
                     </ul>
-                    <button type="button" class="tier-cta" data-tier="basis">Kostenlos schnuppern</button>
+                    <button type="button" class="tier-cta" data-tier="bronze">Für 0,00 Euro abonnieren</button>
                 </article>
 
                 <article class="tier-card glass-panel tier-featured">
                     <p class="tier-badge">Beliebt</p>
-                    <h3 class="tier-name">Silent Flow</h3>
-                    <p class="tier-price">4,99&nbsp;€<span>/Monat</span></p>
+                    <h3 class="tier-name">Silber</h3>
+                    <p class="tier-price">0,00 Euro<span> pro Monat</span></p>
                     <ul class="tier-features">
-                        <li>Alle Profile in voller Auflösung</li>
-                        <li>Exklusive Drehzahlkurven</li>
+                        <li>Mehr Luft</li>
+                        <li>Drehzahlkurven in voller Auflösung</li>
                         <li>Wöchentliches Staubfrei-Update</li>
                     </ul>
-                    <button type="button" class="tier-cta" data-tier="silent">Jetzt abonnieren</button>
+                    <button type="button" class="tier-cta" data-tier="silber">Für 0,00 Euro abonnieren</button>
                 </article>
 
                 <article class="tier-card glass-panel">
-                    <h3 class="tier-name">Full Blast</h3>
-                    <p class="tier-price">9,99&nbsp;€<span>/Monat</span></p>
+                    <h3 class="tier-name">Gold</h3>
+                    <p class="tier-price">0,00 Euro<span> pro Monat</span></p>
                     <ul class="tier-features">
-                        <li>4K-Nahaufnahmen der Lagerbuchse</li>
-                        <li>Persönliche Drehzahlwünsche</li>
-                        <li>Direktnachrichten mit dem Radiator</li>
+                        <li>Dieselbe Luft wie Silber, aber mit RGB</li>
+                        <li>Fühlt sich dadurch teurer an</li>
                     </ul>
-                    <button type="button" class="tier-cta" data-tier="full">Voll reingehen</button>
+                    <button type="button" class="tier-cta" data-tier="gold">Für 0,00 Euro abonnieren</button>
                 </article>
             </div>
 
@@ -124,18 +142,25 @@
         <section id="stage-7" class="stage stage-outro" tabindex="-1" aria-labelledby="stage-7-title" hidden>
             <div class="outro-inner glass-panel">
                 <h2 id="stage-7-title" tabindex="-1" data-focus-target>Erwischt.</h2>
-                <p class="outro-lead">Es gibt kein echtes Only Fans. Es gab nie eins. Es wird nie eins geben.</p>
-                <p class="outro-body">Das hier war die ganze Zeit ein Katalog für PC-Lüfter. Schick das gerne deiner Chat-Community, ich freu mich drüber.</p>
-                <p class="outro-body">Für echten Content bin ich hier unterwegs:</p>
-                <nav class="outro-links" aria-label="Echte Links von Morty">
+                <p class="outro-lead">Hier gab es tatsächlich nie etwas anderes als Lüfter.</p>
+                <p class="outro-body">Die Seite war von Anfang an ein Katalog für PC-Lüfter, und wenn du sie deiner Chat-Community schickst, freue ich mich über jeden, der sich ebenfalls erwischen lässt.</p>
+                <p class="outro-body">Den echten Content findest du hier.</p>
+                <nav class="outro-links" aria-label="Zurück zu Mortys Welt">
                     <a href="https://www.twitch.tv/mortys_welt" target="_blank" rel="noopener noreferrer">Twitch</a>
                     <a href="https://www.youtube.com/@mortyswelt" target="_blank" rel="noopener noreferrer">YouTube</a>
-                    <a href="https://mortys-welt.com/">Alle Links</a>
+                    <a href="../">Alle Links</a>
                 </nav>
                 <button type="button" id="outro-restart">Nochmal von vorne</button>
             </div>
         </section>
     </main>
+
+    <footer class="site-footer">
+        <p class="disclaimer"><strong>Das ist eine Spaßseite von Mortys Welt</strong> ohne jede Verbindung zur Plattform OnlyFans oder deren Betreiber. Alle Lüfter, Hersteller und Daten sind frei erfunden, sodass Ähnlichkeiten mit echten Produkten reiner Zufall wären, und die Zeichnungen sind selbst gemacht. Hier wird nichts verkauft, abonniert oder gespeichert.</p>
+        <p><a class="footer-link" href="../">Zurück zur Startseite</a></p>
+    </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script src="assets/fans.js"></script>
     <script src="assets/app.js"></script>

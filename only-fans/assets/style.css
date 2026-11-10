@@ -29,7 +29,8 @@
     --bg:            #202020;
     --bg-raised:     #2D2D2D;
     --text:          #F0F0F0;
-    --text-muted:    #9A9A9A;
+    --text-muted:    #B8B2AA;
+    --deep:          #161616;
     --accent:        #F5C07C;
     --accent-2:      #F09346;
     --font-sans:     'Inter', system-ui, sans-serif;
@@ -48,7 +49,10 @@
 html { height: 100%; }
 
 body {
+    display: flex;
+    flex-direction: column;
     min-height: 100%;
+    overflow-x: clip;
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-sans);
@@ -59,15 +63,15 @@ body {
 
 main {
     display: block;
-    min-height: 100vh;
-    min-height: 100dvh;
+    flex: 1 0 auto;
+    width: 100%;
 }
 
 /* === FOCUS === */
 a:focus-visible,
-button:focus-visible,
-input:focus-visible {
-    outline: none;
+button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
 }
 
 /* === GLASS PANEL (shared base for later blocks) === */
@@ -84,9 +88,9 @@ input:focus-visible {
 }
 
 .stage {
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: 24px;
+    min-height: calc(100vh - 220px);
+    min-height: calc(100dvh - 220px);
+    padding: 64px 24px 24px;
 }
 
 .stage:focus,
@@ -219,6 +223,12 @@ input:focus-visible {
     color: var(--accent);
 }
 
+.reveal-tagline {
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    font-weight: 600;
+    margin-top: 16px;
+}
+
 .reveal-sub {
     color: var(--text-muted);
     font-size: 0.95rem;
@@ -295,31 +305,43 @@ input:focus-visible {
 }
 
 .obstacle-trap {
-    border: 1px solid #e05555;
+    border: 1px solid var(--accent-2);
     background: var(--bg);
-    color: #e05555;
+    color: var(--accent-2);
 }
 
 .obstacle-trap:hover {
-    background: rgba(224, 85, 85, 0.12);
+    background: rgba(240, 147, 70, 0.12);
 }
 
 .obstacle-real {
     border: 1px solid var(--glass-border);
     background: var(--glass-bg);
     color: var(--text-muted);
-    opacity: 0.3;
     font-size: 0.75rem;
     padding: 6px 12px;
 }
 
 .obstacle-real:disabled {
-    opacity: 0.12;
     cursor: not-allowed;
 }
 
 .obstacle-real.is-ready {
-    opacity: 0.5;
+    border-color: var(--text-muted);
+}
+
+/* Reduced motion: no flying buttons, a plain column instead */
+.obstacle-field.is-static {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+}
+
+.obstacle-field.is-static .obstacle-btn {
+    position: static;
 }
 
 .obstacle-real.is-settled {
@@ -386,56 +408,127 @@ input:focus-visible {
 .fan-photo {
     position: relative;
     aspect-ratio: 4 / 3;
-    background: var(--bg-raised);
+    background: var(--deep);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
 }
 
-.fan-photo-placeholder {
-    color: var(--text-muted);
-    font-size: 0.85rem;
+/* Square fan frame with four screw holes, drawn in CSS */
+.fan-photo::before {
+    content: '';
+    position: absolute;
+    top: 8%;
+    bottom: 8%;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    background:
+        radial-gradient(circle at 9% 9%, var(--bg) 0 5px, transparent 6px),
+        radial-gradient(circle at 91% 9%, var(--bg) 0 5px, transparent 6px),
+        radial-gradient(circle at 9% 91%, var(--bg) 0 5px, transparent 6px),
+        radial-gradient(circle at 91% 91%, var(--bg) 0 5px, transparent 6px),
+        var(--bg-raised);
+    border: 1px solid var(--glass-border);
 }
 
-.fan-photo img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.fan-rotor {
+    position: relative;
+    height: 74%;
+    width: auto;
+    aspect-ratio: 1 / 1;
+    animation: fanSpin var(--spin, 3s) linear infinite;
+}
+
+.fan-rotor.no-spin {
+    animation: none;
+}
+
+@keyframes fanSpin {
+    to { transform: rotate(360deg); }
+}
+
+.gallery-grid.is-boosted .fan-rotor {
+    animation: fanSpin calc(var(--spin, 3s) / 5) linear infinite;
+}
+
+.gallery-grid.is-boosted .fan-rotor.no-spin {
+    animation: fanSpin 1.2s linear infinite;
+}
+
+.fan-card {
+    transition: transform 350ms ease;
+}
+
+.fan-card.is-blown {
+    transform: translateX(16px) rotate(1.5deg);
 }
 
 .fan-card-body {
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .fan-name {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 600;
-    margin-bottom: 12px;
-    min-height: 1.3em;
+}
+
+.fan-maker {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 2px;
+}
+
+.fan-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.status-dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.fan-bio {
+    margin-top: 12px;
+    font-size: 0.95rem;
 }
 
 .fan-specs {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    width: 100%;
+    margin-top: 16px;
+    border-collapse: collapse;
+    font-size: 0.85rem;
 }
 
-.fan-spec-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    font-size: 0.9rem;
+.fan-specs th,
+.fan-specs td {
+    padding: 5px 0;
+    border-top: 1px solid var(--glass-border);
+    vertical-align: top;
+    overflow-wrap: anywhere;
 }
 
-.fan-spec-row dt {
+.fan-specs th {
+    width: 42%;
+    padding-right: 10px;
+    text-align: left;
+    font-weight: 400;
     color: var(--text-muted);
 }
 
-.fan-spec-row dd {
-    font-family: var(--font-mono);
+.fan-specs td {
     text-align: right;
 }
 
@@ -458,20 +551,126 @@ input:focus-visible {
     background: var(--accent);
 }
 
-.placeholder-dash {
-    display: inline-block;
-    width: 14px;
-    height: 2px;
-    background: var(--text-muted);
-    opacity: 0.6;
-    vertical-align: middle;
+.fan-line {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
 }
 
-.fan-comment {
-    margin-top: 14px;
-    color: var(--text-muted);
-    font-size: 0.9rem;
+.fan-line strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.fan-subs {
+    margin-top: 12px;
+    font-size: 0.85rem;
     font-style: italic;
+    color: var(--text-muted);
+}
+
+.fan-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 16px;
+}
+
+.fan-decoy {
+    font: inherit;
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent-2);
+    color: var(--deep);
+    cursor: pointer;
+}
+
+.fan-decoy:hover {
+    background: var(--accent);
+}
+
+.fan-decoy.is-spinning {
+    animation: fanSpin 0.65s linear 2;
+}
+
+.fan-sub-real {
+    font: inherit;
+    font-size: 0.8rem;
+    padding: 6px 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.fan-sub-real:hover,
+.fan-sub-real[aria-pressed='true'] {
+    color: var(--accent);
+}
+
+/* === GALLERY TOOLS === */
+.gallery-tools {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.air-meter {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.air-meter strong {
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+}
+
+.gallery-tool-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.tool-btn {
+    font: inherit;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+}
+
+.tool-btn:hover:not(:disabled) {
+    background: var(--glass-bg);
+}
+
+.tool-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.unlock-wrap {
+    max-width: 420px;
+}
+
+.unlock-wrap[hidden] {
+    display: none;
+}
+
+.unlock-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
 }
 
 .gallery-cta {
@@ -552,7 +751,7 @@ input:focus-visible {
 }
 
 .tier-price {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 800;
     color: var(--accent);
 }
@@ -685,6 +884,101 @@ input:focus-visible {
     color: var(--accent);
 }
 
+/* === GIVE UP, TOAST, FOOTER === */
+.give-up {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 20;
+    font: inherit;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: var(--deep);
+    color: var(--text-muted);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.give-up:hover:not(:disabled) {
+    color: var(--accent);
+}
+
+.give-up:disabled {
+    text-decoration: none;
+    cursor: default;
+}
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    z-index: 30;
+    transform: translate(-50%, 12px);
+    max-width: min(92vw, 460px);
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--accent);
+    background: var(--deep);
+    color: var(--text);
+    font-size: 0.95rem;
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 200ms ease, transform 200ms ease, visibility 200ms;
+}
+
+.toast.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+.site-footer {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px;
+    border-top: 1px solid var(--glass-border);
+    background: var(--deep);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.site-footer p + p {
+    margin-top: 10px;
+}
+
+.site-footer strong {
+    color: var(--text);
+}
+
+.footer-link {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* All gags off */
+.no-gags .gag-only {
+    display: none !important;
+}
+
+.no-gags .fan-rotor {
+    animation: none !important;
+}
+
 /* === NOSCRIPT FALLBACK === */
 .noscript-fallback {
     min-height: 100vh;
@@ -713,5 +1007,10 @@ input:focus-visible {
         animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.001ms !important;
+    }
+
+    .fan-rotor,
+    .gallery-grid.is-boosted .fan-rotor {
+        animation: none !important;
     }
 }

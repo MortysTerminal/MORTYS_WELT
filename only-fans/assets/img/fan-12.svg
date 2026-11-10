@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-hidden="true">
+<defs><path id="b" d="M100,100 C104,86 114,74 130,70 C142,67 152,72 154,82 C150,88 140,87 130,91 C117,96 106,99 100,100 Z"/></defs>
+<circle cx="100" cy="100" r="92" fill="none" stroke="#F5C07C" stroke-width="3" opacity="0.45"/>
+<circle cx="100" cy="100" r="64" fill="none" stroke="#F5C07C" stroke-width="1.5" opacity="0.4"/>
+<circle cx="100" cy="100" r="78" fill="none" stroke="#F5C07C" stroke-width="1.5" opacity="0.4"/>
+<g fill="#F5C07C" stroke="#161616" stroke-width="1.5" stroke-linejoin="round" opacity="0.92">
+<use href="#b" transform="rotate(0.0 100 100)"/>
+<use href="#b" transform="rotate(72.0 100 100)"/>
+<use href="#b" transform="rotate(144.0 100 100)"/>
+<use href="#b" transform="rotate(216.0 100 100)"/>
+<use href="#b" transform="rotate(288.0 100 100)"/>
+</g>
+<circle cx="100" cy="100" r="17" fill="#161616" stroke="#F5C07C" stroke-width="2"/>
+<circle cx="100" cy="100" r="5" fill="#F5C07C"/>
+</svg>

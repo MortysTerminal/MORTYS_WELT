@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-hidden="true">
+<defs><path id="b" d="M100,100 C103,88 112,70 134,58 C142,54 148,58 146,66 C132,74 118,88 108,100 Z"/></defs>
+<circle cx="100" cy="100" r="92" fill="none" stroke="#F0F0F0" stroke-width="3" opacity="0.45"/>
+<g fill="#F0F0F0" stroke="#161616" stroke-width="1.5" stroke-linejoin="round" opacity="0.92">
+<use href="#b" transform="rotate(0.0 100 100)"/>
+<use href="#b" transform="rotate(40.0 100 100)"/>
+<use href="#b" transform="rotate(80.0 100 100)"/>
+<use href="#b" transform="rotate(120.0 100 100)"/>
+<use href="#b" transform="rotate(160.0 100 100)"/>
+<use href="#b" transform="rotate(200.0 100 100)"/>
+<use href="#b" transform="rotate(240.0 100 100)"/>
+<use href="#b" transform="rotate(280.0 100 100)"/>
+<use href="#b" transform="rotate(320.0 100 100)"/>
+</g>
+<circle cx="100" cy="100" r="17" fill="#161616" stroke="#F0F0F0" stroke-width="2"/>
+<circle cx="100" cy="100" r="5" fill="#F0F0F0"/>
+</svg>

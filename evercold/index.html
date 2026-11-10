@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Evercold-Checkliste</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Fan-Checkliste von Mortys Welt zum Abhaken, mit allem, was du in FFXIV bis Evercold vorbereiten kannst (Stand 10.11.2026).">
+<style>
+/* Layout: eine Spalte wie das Auftragstagebuch, oben Termine als Zeitleiste, darunter Kapitel-Fenster mit Abhak-Zeilen.
+   Bewusst nur dunkles Thema (Mortys-Welt-CI). Schriften ohne CDN: Inter und JetBrains Mono, falls installiert, sonst Systemschrift. */
+:root {
+  --grund: #202020; --fenster: #2D2D2D; --kopf: #383838; --eingabe: #161616;
+  --text: #F0F0F0; --leise: #B8B2AA; --gelb: #F5C07C; --orange: #F09346; --auf-akzent: #202020;
+  --richtig: #8FD18F; --falsch: #F2857A; --linie: #4A4540;
+  --schatten: 0 12px 32px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
+  --sans: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--grund); }
+body { margin: 0; color: var(--text); font-family: var(--sans); font-size: 18px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.seite { max-width: 760px; margin: 0 auto; padding-block: 48px 64px; display: flex; flex-direction: column; gap: 48px; }
+h1, h2, h3 { font-weight: 800; font-variation-settings: "opsz" 32; letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
+h1 { font-size: 48px; line-height: 1.05; }
+h1 .akzent { color: var(--gelb); }
+h2 { font-size: 30px; line-height: 1.15; }
+h3 { font-size: 18px; line-height: 1.3; font-weight: 700; }
+p { margin: 0; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+a { color: var(--gelb); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--gelb); outline-offset: 2px; border-radius: 4px; }
+.ico { width: 24px; height: 24px; flex: none; }
+
+header { display: flex; flex-direction: column; gap: 16px; }
+.lead { color: var(--leise); max-width: 60ch; }
+.stand { color: var(--leise); font-size: 15px; }
+
+/* OrnamentTitel: Titel, Goldlinie, Kristall */
+.ornament { display: flex; align-items: center; gap: 16px; }
+.ornament::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--gelb), rgba(245,192,124,.15)); }
+.kristall { width: 12px; height: 12px; transform: rotate(45deg); background: var(--gelb); flex: none; border-radius: 2px; }
+
+/* Fenster */
+.fenster { background: var(--fenster); border-radius: 12px; box-shadow: var(--schatten); overflow: hidden; }
+.fenster-kopf { background: var(--kopf); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  box-shadow: inset 0 -1px 0 rgba(245,192,124,.45); }
+.fenster-kopf h2 { font-size: 22px; line-height: 1.25; }
+.fenster-kopf .zaehler { color: var(--leise); font-size: 15px; white-space: nowrap; }
+.fenster-inhalt { padding: 8px 0; }
+
+/* Fortschritt */
+.fortschritt { display: flex; flex-direction: column; gap: 12px; }
+.balken { height: 12px; background: var(--eingabe); border-radius: 8px; overflow: hidden; }
+.balken > span { display: block; height: 100%; width: 0%; background: var(--gelb); border-radius: 8px; transition: width .3s ease; }
+.fortschritt-zeile { display: flex; justify-content: space-between; align-items: center; gap: 8px 16px; flex-wrap: wrap; font-size: 15px; color: var(--leise); }
+.fortschritt-zeile strong { color: var(--text); font-weight: 700; }
+
+/* Steuerung */
+.steuerung { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filter { display: inline-flex; align-items: center; justify-content: center; line-height: 1.2; font: inherit; font-size: 15px; color: var(--text); background: var(--fenster); border: 0; border-radius: 8px;
+  padding: 8px 16px; min-height: 40px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+.filter[aria-pressed="true"] { background: var(--gelb); color: var(--auf-akzent); font-weight: 700; }
+.zuruecksetzen { margin-left: auto; background: transparent; box-shadow: none; color: var(--leise); text-decoration: underline; text-underline-offset: 3px; }
+.bestaetigen { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 15px; color: var(--leise); width: 100%; justify-content: flex-end; }
+
+/* Fortschritt mitnehmen */
+.mitnehmen { background: var(--fenster); border-radius: 12px; box-shadow: var(--schatten); }
+.mitnehmen summary { cursor: pointer; padding: 12px 24px; min-height: 48px; display: flex; align-items: center; font-size: 16px; font-weight: 600; border-radius: 12px; }
+.mitnehmen[open] summary { box-shadow: inset 0 -1px 0 var(--linie); border-radius: 12px 12px 0 0; }
+.mitnehmen-inhalt { padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+.mitnehmen-inhalt p { font-size: 15px; color: var(--leise); max-width: 60ch; }
+.mitnehmen-zeile { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.mitnehmen-zeile label { font-size: 16px; font-weight: 600; width: 100%; }
+.mitnehmen-zeile input[type="text"] { flex: 1 1 220px; min-width: 0; font: inherit; font-size: 16px; color: var(--text); background: var(--eingabe);
+  border: 0; border-radius: 8px; padding: 8px 12px; min-height: 40px; box-shadow: inset 0 0 0 2px var(--linie); }
+.mitnehmen-status { font-size: 15px; color: var(--leise); }
+.mitnehmen-status:empty { display: none; }
+.mitnehmen-status.fehler { color: var(--falsch); }
+.mitnehmen-status.ok { color: var(--richtig); }
+
+.bestaetigen[hidden] { display: none; }
+
+/* Termine wie Zeitleiste */
+.termine { list-style: none; margin: 0; padding: 8px 24px 16px; display: flex; flex-direction: column; }
+.termin { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 4px 24px; padding: 12px 0; }
+.termin + .termin { box-shadow: inset 0 1px 0 var(--linie); }
+.termin .wann { color: var(--gelb); font-size: 16px; }
+.termin .was { font-weight: 700; }
+.termin .warum { color: var(--leise); font-size: 15px; grid-column: 2; }
+@media (max-width: 560px) { .termin { grid-template-columns: minmax(0,1fr); } .termin .warum { grid-column: 1; } }
+
+/* Ampel-Marker: Symbol plus Wort */
+.ampel { display: inline-flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 600; line-height: 24px; height: 24px; white-space: nowrap; }
+.ampel .ico { width: 18px; height: 18px; }
+.ampel-gruen { color: var(--richtig); }
+.ampel-gelb { color: var(--gelb); }
+.ampel-rot { color: var(--falsch); }
+.legende { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+
+/* Aufgaben */
+.aufgabe { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 4px 16px; padding: 16px 24px; }
+.aufgabe + .aufgabe { box-shadow: inset 0 1px 0 var(--linie); }
+.aufgabe input { appearance: none; -webkit-appearance: none; width: 24px; height: 24px; margin: 0; align-self: start; border-radius: 4px;
+  background: var(--eingabe); box-shadow: inset 0 0 0 2px var(--linie); cursor: pointer; display: grid; place-content: center; }
+.aufgabe input::after { content: ""; width: 12px; height: 7px; border: solid var(--auf-akzent); border-width: 0 0 3px 3px; transform: rotate(-45deg) translate(1px,-1px); opacity: 0; }
+.aufgabe input:checked { background: var(--gelb); box-shadow: none; }
+.aufgabe input:checked::after { opacity: 1; }
+.aufgabe label { cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 24px; }
+.aufgabe label h3 { line-height: 24px; }
+.aufgabe .beschreibung { grid-column: 2; color: var(--leise); font-size: 16px; }
+.aufgabe ul { grid-column: 2; margin: 4px 0 0; padding-left: 20px; color: var(--leise); font-size: 16px; display: flex; flex-direction: column; gap: 4px; }
+.aufgabe.erledigt label h3 { color: var(--leise); text-decoration: line-through; text-decoration-color: rgba(184,178,170,.6); }
+.versteckt { display: none; }
+
+/* Lassen-Liste */
+.lassen { list-style: none; margin: 0; padding: 8px 24px 16px; display: flex; flex-direction: column; }
+.lassen li { padding: 12px 0; display: grid; grid-template-columns: auto minmax(0,1fr); gap: 4px 12px; }
+.lassen li + li { box-shadow: inset 0 1px 0 var(--linie); }
+.lassen .warum { grid-column: 2; color: var(--leise); font-size: 16px; }
+.lassen .rot { color: var(--falsch); display: flex; }
+
+footer { display: flex; flex-direction: column; gap: 12px; color: var(--leise); font-size: 15px; }
+footer p { max-width: 65ch; }
+@media (max-width: 480px) { h1 { font-size: 36px; } h2 { font-size: 24px; } .fenster-kopf, .aufgabe, .termine, .lassen { padding-left: 16px; padding-right: 16px; } }
+@media (prefers-reduced-motion: reduce) { .balken > span { transition: none; } }
+
+/* Druckfassung: heller Spickzettel, Kontrollkästchen als leere Kästchen */
+@media print {
+  :root { --grund: #fff; --fenster: #fff; --kopf: #fff; --eingabe: #fff; --text: #000; --leise: #333; --gelb: #000; --linie: #bbb;
+    --richtig: #1a6b1a; --falsch: #a02020; --auf-akzent: #000; --schatten: none; color-scheme: light; }
+  html, body { background: #fff !important; color: #000; }
+  body { font-size: 11pt; line-height: 1.45; padding-left: 0; padding-right: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .seite { max-width: none; padding-block: 0; gap: 18px; }
+  h1 { font-size: 26pt; }
+  h2, .fenster-kopf h2 { font-size: 14pt; break-after: avoid; }
+  h3 { font-size: 11pt; }
+  .lead, .stand, .aufgabe .beschreibung, .aufgabe ul, .termin .warum, .lassen .warum, footer { font-size: 10pt; color: #333; }
+  a { color: #000; }
+  .fenster { background: #fff; box-shadow: none; border: 1px solid #aaa; border-radius: 6px; overflow: visible; }
+  .fenster-kopf { background: #fff; box-shadow: none; border-bottom: 1px solid #aaa; padding: 8px 14px; break-after: avoid; }
+  .aufgabe { break-inside: avoid; padding: 8px 14px; gap: 2px 12px; }
+  .aufgabe + .aufgabe, .termin + .termin, .lassen li + li { box-shadow: none; border-top: 1px solid #ddd; }
+  .termin, .lassen li { break-inside: avoid; }
+  .termine, .lassen { padding: 4px 14px 8px; }
+  .aufgabe input { background: #fff; box-shadow: none; border: 1.5px solid #000; border-radius: 3px; width: 16px; height: 16px; margin-top: 4px; }
+  .aufgabe input::after { border-color: #000; width: 9px; height: 5px; border-width: 0 0 2px 2px; }
+  .aufgabe input:checked { background: #fff; box-shadow: none; }
+  .aufgabe { grid-template-columns: 16px minmax(0, 1fr); }
+  .aufgabe.erledigt label h3 { color: #000; text-decoration: none; }
+  .termin .wann { color: #000; font-size: 10pt; }
+  .balken, .steuerung, .mitnehmen, #motivation, .fortschritt-zeile > span:first-child { display: none !important; }
+  .fortschritt-zeile { justify-content: flex-start; }
+  .versteckt { display: none !important; }
+}
+</style>
+<link rel="icon" href="../favicon.ico" sizes="48x48">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#202020">
+<meta property="og:title" content="Bereit für Evercold">
+<meta property="og:description" content="Fan-Checkliste von Mortys Welt zum Abhaken, mit allem, was du in FFXIV bis Evercold vorbereiten kannst.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mortys-welt.com/evercold/">
+<style>
+/* Self-hosted Inter from the repo (no external requests) */
+@font-face { font-family: "Inter"; src: url("../fonts/Inter/Inter-VariableFont_opsz%2Cwght.ttf") format("truetype");
+  font-style: normal; font-weight: 100 900; font-display: swap; }
+.zurueck { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; margin-bottom: -24px; color: var(--leise); font-size: 15px; text-decoration: none; border-radius: 4px; }
+.zurueck:hover { color: var(--gelb); }
+.zurueck img { width: 32px; height: 32px; display: block; }
+@media print { .zurueck { display: none; } }
+</style>
+
+</head>
+<body>
+<main class="seite">
+<a class="zurueck" href="../"><img src="../favicon.svg" width="32" height="32" alt=""><span>Mortys Welt</span></a>
+<header>
+  <h1>Bereit für <span class="akzent">Evercold</span></h1>
+  <p class="lead">Du musst nichts davon machen, aber jeder Haken nimmt dir bis zum Start am 23. Februar 2027 ein bisschen Arbeit ab, also such dir einfach raus, was zu dir passt.</p>
+  <p class="stand">Stand <span class="mono">10.11.2026</span>, zusammengestellt von Mortys Welt nach dem Fan Festival Tokio</p>
+</header>
+
+<section class="fortschritt" aria-label="Fortschritt">
+  <div class="balken" role="progressbar" aria-valuemin="0" aria-valuemax="43" aria-valuenow="0" id="balken"><span id="balken-fuellung"></span></div>
+  <div class="fortschritt-zeile"><span><strong id="erledigt-zahl" class="mono">0</strong> von <span class="mono">43</span> erledigt</span>
+  <span class="legende"><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span><span class="ampel ampel-rot"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 7L7 17"/></svg><span>Kannst du lassen</span></span></span></div>
+  <p class="stand" id="motivation" aria-live="polite">Noch nichts abgehakt, und das ist völlig in Ordnung, fang einfach mit einer Kleinigkeit an.</p>
+  <div class="steuerung" role="group" aria-label="Filter">
+    <button class="filter" type="button" id="f-alle" data-filter="alle" aria-pressed="true">Alle</button>
+    <button class="filter" type="button" id="f-offen" data-filter="offen" aria-pressed="false">Nur offene</button>
+    <button class="filter" type="button" id="f-gruen" data-filter="g" aria-pressed="false">Lohnt sich</button>
+    <button class="filter" type="button" id="f-gelb" data-filter="y" aria-pressed="false">Abwarten</button>
+    <button class="filter zuruecksetzen" type="button" id="reset">Alle Haken entfernen</button>
+    <div class="bestaetigen" id="bestaetigen" hidden><span>Wirklich alle Haken entfernen?</span>
+      <button class="filter" type="button" id="reset-ja">Ja, entfernen</button>
+      <button class="filter" type="button" id="reset-nein">Abbrechen</button></div>
+  </div>
+  <details class="mitnehmen" id="mitnehmen">
+    <summary>Fortschritt auf ein anderes Gerät mitnehmen</summary>
+    <div class="mitnehmen-inhalt">
+      <p>Deine Haken liegen nur in diesem Browser auf diesem Gerät, ganz ohne Konto und ohne Server, und wer Browserdaten löscht oder im privaten Fenster surft, verliert sie. Mit dem Code nimmst du deinen Stand auf ein anderes Gerät mit.</p>
+      <div class="mitnehmen-zeile">
+        <button class="filter" type="button" id="code-kopieren">Code kopieren</button>
+        <input type="text" id="code-aus" readonly hidden aria-label="Dein Code">
+      </div>
+      <div class="mitnehmen-zeile">
+        <label for="code-ein">Code einfügen</label>
+        <input type="text" id="code-ein" autocomplete="off" spellcheck="false" placeholder="MW1:...">
+        <button class="filter" type="button" id="code-uebernehmen">Übernehmen</button>
+      </div>
+      <p class="mitnehmen-status" id="code-status" role="status" aria-live="polite"></p>
+    </div>
+  </details>
+</section>
+
+<section aria-labelledby="t-termine" class="fenster">
+  <div class="fenster-kopf"><h2 id="t-termine">Termine bis zum Launch</h2></div>
+  <ol class="termine">
+<li class="termin"><span class="wann mono">seit Mi 04.11.2026</span><span class="was">Vorbestellung offen</span><span class="warum">Halone-Ohrring und Begleiter Köttr-Puppe gibt es sofort, Früher Zugang folgt im Februar</span></li>
+<li class="termin"><span class="wann mono">seit Di 10.11.2026</span><span class="was">Matching innerhalb derselben Region (Patch 7.58)</span><span class="warum">gilt in Europa für Inhaltssuche und Gruppensuche</span></li>
+<li class="termin"><span class="wann mono">Anfang Dezember 2026</span><span class="was">Benchmark mit Charakter-Editor</span><span class="warum">dann siehst du, ob dein PC Evercold packt</span></li>
+<li class="termin"><span class="wann mono">ca. 01.02.2027</span><span class="was">Keine Freibriefe mehr annehmen</span><span class="warum">damit die Freibrief-Vollmachten bis zum Launch voll sind</span></li>
+<li class="termin"><span class="wann mono">Di 09.02.2027</span><span class="was">Khloes Abenteueralbum holen (mit Früher Zugang)</span><span class="warum">du füllst es schon, gibst es aber noch nicht ab</span></li>
+<li class="termin"><span class="wann mono">Di 16.02.2027, ab 9 Uhr</span><span class="was">Aktuelle Agenda vorbereiten</span><span class="warum">ohne Früher Zugang holst du jetzt erst das Album</span></li>
+<li class="termin"><span class="wann mono">Fr 19.02.2027, ca. 10 Uhr</span><span class="was">Früher Zugang</span><span class="warum">jetzt gibst du das Album ab, löst die Agenda ein und schickst die Gehilfen los</span></li>
+<li class="termin"><span class="wann mono">Di 23.02.2027</span><span class="was">Evercold erscheint</span><span class="warum">ohne Früher Zugang gibst du das Album jetzt ab</span></li>
+</ol></section>
+<section class="fenster kapitel" aria-labelledby="t-jeder" data-kapitel="jeder"><div class="fenster-kopf"><h2 id="t-jeder">Das sollte jeder erledigen</h2><span class="zaehler mono" data-zaehler="jeder">0 / 9</span></div><div class="fenster-inhalt">
+<div class="aufgabe" data-ampel="g" data-id="msq"><input type="checkbox" id="cb-msq" aria-describedby="b-msq"><label for="cb-msq"><h3>Hauptszenario bis Patch 7.56 abschließen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-msq">Evercold setzt genau dort an, sodass du ohne Lücken in die Geschichte einsteigst.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="alt"><input type="checkbox" id="cb-alt" aria-describedby="b-alt"><label for="cb-alt"><h3>Fehlende Dungeons, Prüfungen und Raids freischalten</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-alt">Vor einer Erweiterung kommen viele Spieler zurück, weshalb die Warteschlangen gar nicht so leer sind und seit Patch 7.58 zusätzlich das Matching innerhalb derselben Region greift.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="zenit"><input type="checkbox" id="cb-zenit" aria-describedby="b-zenit"><label for="cb-zenit"><h3>Twinks: Hauptszenario von Stormblood abschließen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-zenit">Das ist die Voraussetzung für den Zenit der Macht, einen neuen Boss-Rush ab Stufe 51 gegen bis zu fünf Dungeon-Bosse am Stück.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="vorbestellen"><input type="checkbox" id="cb-vorbestellen" aria-describedby="b-vorbestellen"><label for="cb-vorbestellen"><h3>Evercold vorbestellen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-vorbestellen">Damit hast du Halone-Ohrring und Köttr-Puppe sofort und bekommst im Februar den Frühen Zugang.</p><ul><li>Gilt für jede Edition, den Vorbestellungscode musst du im angegebenen Zeitraum einlösen</li><li>Halone-Ohrring: passt sich Job und Stufe an und gibt bis Stufe 100 30 % mehr Routine durch besiegte Gegner, also in Dungeons, FATEs und Hohe Jagd</li><li>Für den Frühen Zugang musst du bestimmte Aufträge in Dawntrail abgeschlossen haben</li></ul></div>
+<div class="aufgabe" data-ampel="g" data-id="inventar"><input type="checkbox" id="cb-inventar" aria-describedby="b-inventar"><label for="cb-inventar"><h3>Inventar aufräumen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-inventar">Am Launch-Tag willst du Aufträge annehmen und nicht erst Platz schaffen, also sortier jetzt auch Gehilfen und Chocobo-Satteltasche durch.</p><ul><li>Ausrüstung fürs Aussehen in die Projektionskommode (die du selbst auch aufräumen solltest), den Rest verarbeiten, verkaufen oder wegwerfen</li><li>Das Kostbarkeitenkabinett spart Platz</li></ul></div>
+<div class="aufgabe" data-ampel="g" data-id="backup"><input type="checkbox" id="cb-backup" aria-describedby="b-backup"><label for="cb-backup"><h3>Einstellungen sichern</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-backup">Das neue Kampfsystem ändert deine Kommandomenüs für alle, auch ohne Evercold-Lizenz, deshalb lohnt sich vorher ein Server-Backup auf dem Charakterauswahl-Bildschirm und am PC zusätzlich eine Kopie des Einstellungsordners.</p><ul><li>Das Server-Backup sichert Client-Einstellungen und Charaktereinstellungen wie das HUD-Layout</li></ul></div>
+<div class="aufgabe" data-ampel="g" data-id="fantasia"><input type="checkbox" id="cb-fantasia" aria-describedby="b-fantasia"><label for="cb-fantasia"><h3>Fantasia aufheben</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-fantasia">Mit Evercold kommt eine freie Farbwahl unter anderem für Augen, Haare und Haut.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="benchmark"><input type="checkbox" id="cb-benchmark" aria-describedby="b-benchmark"><label for="cb-benchmark"><h3>Benchmark testen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-benchmark">Zum Test gehört der Charakter-Editor, in dem du schon an deinem Look basteln kannst.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="ps4"><input type="checkbox" id="cb-ps4" aria-describedby="b-ps4"><label for="cb-ps4"><h3>PS4: Plattform im Blick behalten</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-ps4">Evercold kommt auch für PS4, die Unterstützung ist laut Yoshi-P aber voraussichtlich nur bis Patch 8.3 geplant.</p></div>
+</div></section>
+<section class="fenster kapitel" aria-labelledby="t-routine" data-kapitel="routine"><div class="fenster-kopf"><h2 id="t-routine">Routine auf Vorrat</h2><span class="zaehler mono" data-zaehler="routine">0 / 10</span></div><div class="fenster-inhalt">
+<div class="aufgabe" data-ampel="g" data-id="neben"><input type="checkbox" id="cb-neben" aria-describedby="b-neben"><label for="cb-neben"><h3>Nebenaufträge vorbereiten</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-neben">Nimm sie an und erledige das Ziel, gib sie aber erst nach dem Launch ab, wobei du maximal 30 Aufträge gleichzeitig annehmen kannst.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="jagd"><input type="checkbox" id="cb-jagd" aria-describedby="b-jagd"><label for="cb-jagd"><h3>Hohe Jagd vorbereiten</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-jagd">Erledige die Ziele aus dem Clan-Jägertagebuch schon vorher und melde sie erst am Launch.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="freunde"><input type="checkbox" id="cb-freunde" aria-describedby="b-freunde"><label for="cb-freunde"><h3>Zusatzaufträge der Freundesvölker vorbereiten</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-freunde">Die Abgabe zählt mit dem Job, mit dem du sie angenommen hast, weshalb das für Bastion und Zephyr nichts bringt.</p></div>
+<div class="aufgabe" data-ampel="y" data-id="album"><input type="checkbox" id="cb-album" aria-describedby="b-album"><label for="cb-album"><h3>Khloes Abenteueralbum aufheben</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-album">Ein volles Album bringt beim Abgeben Routine, solange du nicht auf Maximalstufe bist, und gleich danach kannst du das nächste holen.</p><ul><li>Mit Früher Zugang: Album am Di 09.02. holen, ab Fr 19.02. abgeben</li><li>Ohne Früher Zugang: Album am Di 16.02. holen, am Di 23.02. abgeben</li><li>Offen, ob das Album mit dem neuen System so bleibt, es kostet dich aber nichts</li></ul></div>
+<div class="aufgabe" data-ampel="y" data-id="agenda"><input type="checkbox" id="cb-agenda" aria-describedby="b-agenda"><label for="cb-agenda"><h3>Aktuelle Agenda vorbereiten</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-agenda">Lass die Herausforderungen einen Schritt vor dem Ziel stehen, was wegen des Resets jeden Dienstag um 9 Uhr nur mit Früher Zugang klappt, weil dein Fortschritt am Release-Morgen sonst wahrscheinlich weg ist.</p><ul><li>Ab Di 16.02., 9 Uhr: 2 Dungeons über einen Zufallsinhalt und 2 Dungeons direkt, in jedem eine Ehrung zum WS</li><li>Ab Fr 19.02.: 1 Zufallsinhalt mit Dungeon und 1 Ehrung, drei Herausforderungen auf einmal</li><li>Bei FATEs, Gildengeheißen und Freibriefen genauso einen Schritt vorher aufhören, dazwischen keine weiteren Dungeons</li><li>Offen, ob die Aktuelle Agenda neben der Adventurer Activity so bleibt</li></ul></div>
+<div class="aufgabe" data-ampel="y" data-id="roulette"><input type="checkbox" id="cb-roulette" aria-describedby="b-roulette"><label for="cb-roulette"><h3>Launch-Tag: Zufallsinhalte zweimal mitnehmen</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-roulette">Der Bonus gilt pro Kategorie einmal am Tag mit Reset um 16 Uhr, also nimm vormittags alle mit und nach 16 Uhr noch einmal.</p><ul><li>Offen, ob der Tagesbonus bleibt</li></ul></div>
+<div class="aufgabe" data-ampel="g" data-id="ruhe"><input type="checkbox" id="cb-ruhe" aria-describedby="b-ruhe"><label for="cb-ruhe"><h3>Im Ruhebereich ausloggen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-ruhe">Das bringt Erholungsbonus, und zwar für Bastion in Limsa Lominsa und für Zephyr in Gridania.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="essen"><input type="checkbox" id="cb-essen" aria-describedby="b-essen"><label for="cb-essen"><h3>Essen bereitlegen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-essen">Jedes Essen gibt einen kleinen Routine-Bonus, auch das billigste, also halte den Effekt einfach immer aktiv.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="leitfaden"><input type="checkbox" id="cb-leitfaden" aria-describedby="b-leitfaden"><label for="cb-leitfaden"><h3>Bonus aus Truppen-Einsätzen sammeln</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-leitfaden">Die Einsätze deiner Truppe bei der Staatlichen Gesellschaft erhöhen deine Routine durch besiegte Gegner.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="heiler"><input type="checkbox" id="cb-heiler" aria-describedby="b-heiler"><label for="cb-heiler"><h3>Einen Heiler mitleveln</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-heiler">Am Anfang wollen alle Bastion und Zephyr spielen, deshalb kommen Heiler sofort in die Inhaltssuche, am besten mit dem Halone-Ohrring.</p><ul><li>Als Bastion hilft der Inhaltshelfer, bei dem sich laut Keynote zwei Spieler zusammen anmelden können und NPCs den Rest auffüllen</li></ul></div>
+</div></section>
+<section class="fenster kapitel" aria-labelledby="t-ausruestung" data-kapitel="ausruestung"><div class="fenster-kopf"><h2 id="t-ausruestung">Ausrüstung und Allagische Steine</h2><span class="zaehler mono" data-zaehler="ausruestung">0 / 5</span></div><div class="fenster-inhalt">
+<div class="aufgabe" data-ampel="g" data-id="st90"><input type="checkbox" id="cb-st90" aria-describedby="b-st90"><label for="cb-st90"><h3>Stufe-90-Ausrüstung für die neuen Jobs</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-st90">Bastion und Zephyr starten auf Stufe 90, und weil du beim Leveln echte Ausrüstung brauchst, lohnt sich die schon vorher.</p><ul><li>Bastion (Verteidiger): Ausrüstung der Verteidigung, Jobauftrag in Limsa Lominsa</li><li>Zephyr (Fernkampf, Armbrust): Ausrüstung des Zielens, Jobauftrag in Gridania</li><li>Zum Beispiel Credendum-Ausrüstung [G.-St. 660] bei der Agora-Händlerin in Alt-Sharlayan</li><li>Das Erweiterte Arsenal hilft hier nicht, weil Item Level Link nur auf Jobs mit Stufe 110 überträgt</li></ul></div>
+<div class="aufgabe" data-ampel="y" data-id="st100neu"><input type="checkbox" id="cb-st100neu" aria-describedby="b-st100neu"><label for="cb-st100neu"><h3>Stufe-100-Ausrüstung nicht verkaufen</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-st100neu">Hast du einen Verteidiger und einen Fernkämpfer auf 100, kaufst du für die neuen Jobs vorerst nichts, weil du auf deren Ausrüstung zurückgreifen kannst.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="poesie"><input type="checkbox" id="cb-poesie" aria-describedby="b-poesie"><label for="cb-poesie"><h3>Allagische Steine der Poesie ausgeben</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-poesie">Laut Yoshi-P fallen die Steine der Poesie mit Evercold weg, gib sie also zum Beispiel für die Stufe-90-Ausrüstung aus.</p><ul><li>Quelle ist das englische Q&amp;A-Transkript aus Tokio, hier sinngemäß übersetzt</li></ul></div>
+<div class="aufgabe" data-ampel="y" data-id="steine"><input type="checkbox" id="cb-steine" aria-describedby="b-steine"><label for="cb-steine"><h3>Steine der Mathematik und Mnemonik voll machen</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-steine">Zu Shadowbringers, Endwalker und Dawntrail konntest du alte Steine bei Auriana in Geisterzoll tauschen, und diesmal bleiben die Allagischen Steine als eine Währung.</p><ul><li>Gelb, weil zu Dawntrail die Steine der Astronomie ohne Umtausch entfernt wurden und Yoshi-P nicht gesagt hat, was mit deinen Steinen passiert</li></ul></div>
+<div class="aufgabe" data-ampel="g" data-id="main"><input type="checkbox" id="cb-main" aria-describedby="b-main"><label for="cb-main"><h3>Für deinen Main: ein ordentliches Set für Stufe 100</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-main">Das reicht völlig, weil du die Ausrüstung beim Leveln schnell ersetzt.</p><ul><li>Als Handwerker nimmst du zum Beispiel die aktuelle Hofliebhaber-Ausrüstung (Gegenstandsstufe 770)</li><li>Dazu kommen Drops aus dem normalen Arkadion oder Ausrüstung gegen Allagische Steine der Mnemonik, und seit Patch 7.58 lassen sich Waffen für Steine der Mnemonik bis Gegenstandsstufe 790 aufwerten</li></ul></div>
+</div></section>
+<section class="fenster kapitel" aria-labelledby="t-gil" data-kapitel="gil"><div class="fenster-kopf"><h2 id="t-gil">Gil zum Launch</h2><span class="zaehler mono" data-zaehler="gil">0 / 7</span></div><div class="fenster-inhalt">
+<div class="aufgabe" data-ampel="y" data-id="materia"><input type="checkbox" id="cb-materia" aria-describedby="b-materia"><label for="cb-materia"><h3>Ungeliebte Materia sammeln</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-materia">Nach dem Launch tauschst du sie bei Mutagenix Lexikus im Zentralen Thanalan im Verhältnis 5 gegen 1, wobei mit Glück eine neue Stufe herauskommt.</p><ul><li>Auftrag &quot;Wechselmischen&quot; bei Kokosamu im Zentralen Thanalan ab Stufe 19, der nach unserem Stand den Tausch freischaltet</li><li>Die neue Saison-Ausrüstung hat zwei Materia-Plätze</li><li>Zu Overmelding gibt es noch keine Infos, dazu soll ein Live-Letter kommen</li></ul></div>
+<div class="aufgabe" data-ampel="g" data-id="gehilfen"><input type="checkbox" id="cb-gehilfen" aria-describedby="b-gehilfen"><label for="cb-gehilfen"><h3>Gehilfen ausrüsten</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-gehilfen">Sie brachten bei neuen Erweiterungen oft seltene Sachen mit, also schick sie am Launch-Tag sofort auf Unternehmungen.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="edelsteine"><input type="checkbox" id="cb-edelsteine" aria-describedby="b-edelsteine"><label for="cb-edelsteine"><h3>Zweifarbige Edelsteine voll machen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-edelsteine">Du kannst sie später gegen Rohstoffe tauschen, zum Beispiel bei Kajeel Ja in Tuliyollal.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="taler"><input type="checkbox" id="cb-taler" aria-describedby="b-taler"><label for="cb-taler"><h3>Staatstaler voll machen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-taler">Gib dafür Dungeon-Ausrüstung bei deiner Staatlichen Gesellschaft ab oder stell die benötigten Gegenstände her und level dabei nebenbei Handwerker.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="kupo"><input type="checkbox" id="cb-kupo" aria-describedby="b-kupo"><label for="cb-kupo"><h3>Kupo-Trophäen voll machen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-kupo">Sie kommen aus der Hohen Jagd, und bei früheren Erweiterungen gab es dafür direkt Neues.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="tickets"><input type="checkbox" id="cb-tickets" aria-describedby="b-tickets"><label for="cb-tickets"><h3>Teleport-Tickets holen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-tickets">Du bekommst sie gegen Jagdabzeichen und Centurio-Abzeichen und brauchst sie, weil du am Anfang ständig teleportierst.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="bindung"><input type="checkbox" id="cb-bindung" aria-describedby="b-bindung"><label for="cb-bindung"><h3>Bindungstränke einlagern</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-bindung">Trank der Bindung oder Starker Bindungstrunk füllen die Bindung schneller, sodass du die Materia bei 100 % herausholst.</p><ul><li>Nutze sie beim Kämpfen, Sammeln und Herstellen und extrahiere sofort, denn am Anfang sind es die neuen und teuren Materia</li></ul></div>
+</div></section>
+<section class="fenster kapitel" aria-labelledby="t-handwerk" data-kapitel="handwerk"><div class="fenster-kopf"><h2 id="t-handwerk">Handwerker und Sammler</h2><span class="zaehler mono" data-zaehler="handwerk">0 / 7</span></div><div class="fenster-inhalt">
+<div class="aufgabe" data-ampel="g" data-id="sammler"><input type="checkbox" id="cb-sammler" aria-describedby="b-sammler"><label for="cb-sammler"><h3>Sammlerstücke der Stufe 100 vorproduzieren</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-sammler">Sie bringen Scheine und Routine, und weil sich die Routine nach deiner Stufe richtet, gibst du sie früh ab, wobei jedes Stück einen eigenen Platz braucht.</p><ul><li>Zimmerer: Clarowalnuss-Angelrute</li><li>Grobschmied: Ra&#x27;Kaznar-Rundmesser</li><li>Plattner: Ra&#x27;Kaznar-Ring</li><li>Goldschmied: Schwarzstern-Ohrringe</li><li>Gerber: Gargantualeder-Hut</li><li>Weber: Donnersteppenseiden-Weithose</li><li>Alchemist: Clarowalnuss-Flachpinsel</li><li>Gourmet: Tacos de Carne Asada</li><li>Minenarbeiter: Ra&#x27;Kaznar-Erz</li><li>Gärtner: Akazien-Holzscheit oder Windlorbeer</li></ul></div>
+<div class="aufgabe" data-ampel="g" data-id="vollmachten"><input type="checkbox" id="cb-vollmachten" aria-describedby="b-vollmachten"><label for="cb-vollmachten"><h3>Freibrief-Vollmachten volllaufen lassen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-vollmachten">Sie füllen sich mit der Zeit auf, und du musst nur rechtzeitig aufhören, Freibriefe anzunehmen (der Termin steht oben).</p></div>
+<div class="aufgabe" data-ampel="g" data-id="liefer"><input type="checkbox" id="cb-liefer" aria-describedby="b-liefer"><label for="cb-liefer"><h3>Liefereinsätze täglich mitnehmen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-liefer">Pro Handwerker und Sammler gibt es bei deiner Staatlichen Gesellschaft einen Einsatz, der Routine und Staatstaler bringt und sich nicht aufheben lässt, also lohnt er sich jeden Tag.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="werkzeug"><input type="checkbox" id="cb-werkzeug" aria-describedby="b-werkzeug"><label for="cb-werkzeug"><h3>Ausrüstung und Werkzeuge fertig machen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-werkzeug">Sternentechnologie-Ausrüstung bekommst du aus Orangen Handwerkerscheinen, und wer mehr will, nimmt Kosmo-Werkzeuge auf Auxesia, bei denen du nicht von vorne anfangen musst.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="almanach"><input type="checkbox" id="cb-almanach" aria-describedby="b-almanach"><label for="cb-almanach"><h3>Folklore-Almanache holen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-almanach">Du holst sie bei der Scheinewechslerin in Tuliyollal, je drei pro Sammler-Job, für Alexandria, Xak Tural und Yok Tural.</p><ul><li>Zum Beispiel Xak-turalischer Bergbau-Almanach, Yok-turalischer Botanik-Almanach und Alexandrischer Fischer-Almanach</li><li>Die Sammelstellen geben auch nach dem Launch noch ordentlich Bindung</li></ul></div>
+<div class="aufgabe" data-ampel="y" data-id="lowmateria"><input type="checkbox" id="cb-lowmateria" aria-describedby="b-lowmateria"><label for="cb-lowmateria"><h3>Günstige Materia aufheben</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-lowmateria">Die erste neue Handwerker-Ausrüstung ließ sich bisher oft mit günstiger Materia ausreizen.</p><ul><li>Facharbeiter-, Fachkenntnis- und Fachwissen-Materia über Scheine, für Sammler Sammlersold, Sammlerschlich und Sammlersinn</li></ul></div>
+<div class="aufgabe" data-ampel="y" data-id="material"><input type="checkbox" id="cb-material" aria-describedby="b-material"><label for="cb-material"><h3>Vorhandene Materialien behalten</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-material">Was du ohnehin hast, behältst du einfach, aber extra Gil gibst du dafür vorerst nicht aus.</p></div>
+</div></section>
+<section class="fenster kapitel" aria-labelledby="t-raid" data-kapitel="raid"><div class="fenster-kopf"><h2 id="t-raid">Für Raider</h2><span class="zaehler mono" data-zaehler="raid">0 / 3</span></div><div class="fenster-inhalt">
+<div class="aufgabe" data-ampel="g" data-id="gruppe"><input type="checkbox" id="cb-gruppe" aria-describedby="b-gruppe"><label for="cb-gruppe"><h3>Feste Gruppe suchen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-gruppe">Die Community sagt Static, und die Gruppe zu finden ist erfahrungsgemäß schwerer als der Raid.</p></div>
+<div class="aufgabe" data-ampel="g" data-id="raidgil"><input type="checkbox" id="cb-raidgil" aria-describedby="b-raidgil"><label for="cb-raidgil"><h3>Gil für Essen und Tränke sparen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-raidgil">Zum Start ist alles Neue teuer, und Jenseits des Lebensstroms beginnt mit Normal in 8.01, Episch in 8.05 und Erbittert eine Woche später.</p></div>
+<div class="aufgabe" data-ampel="y" data-id="raidmateria"><input type="checkbox" id="cb-raidmateria" aria-describedby="b-raidmateria"><label for="cb-raidmateria"><h3>Ein paar Materia aufheben</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-raidmateria">Die neue Raid-Ausrüstung startet ohne Materia-Plätze, deshalb brauchst du keine Berge davon.</p></div>
+</div></section>
+<section class="fenster kapitel" aria-labelledby="t-kampf" data-kapitel="kampf"><div class="fenster-kopf"><h2 id="t-kampf">Neues Kampfsystem</h2><span class="zaehler mono" data-zaehler="kampf">0 / 2</span></div><div class="fenster-inhalt">
+<div class="aufgabe" data-ampel="y" data-id="menues"><input type="checkbox" id="cb-menues" aria-describedby="b-menues"><label for="cb-menues"><h3>Kommandomenüs erst später planen</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-menues">Warte die Live-Sendung ab, in der alle Jobs vorgestellt werden, und plane danach zum Beispiel mit Webseiten wie XIVBars.</p><ul><li>Jeder Job hat zwei Spielweisen, Reborn-Modus und Evolution-Modus, außer Bastion und Zephyr, die es nur im Evolution-Modus gibt</li></ul></div>
+<div class="aufgabe" data-ampel="g" data-id="hausaufgabe"><input type="checkbox" id="cb-hausaufgabe" aria-describedby="b-hausaufgabe"><label for="cb-hausaufgabe"><h3>Hausaufgabe: Final Fantasy VII und Evangelion</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-hausaufgabe">Jenseits des Lebensstroms kommt mit Evercold und EVANGELION - Ghosts of Desire mit Patch 8.1, da schadet es nicht, die Vorlagen vorher zu kennen.</p></div>
+</div></section>
+<section class="fenster" aria-labelledby="t-lassen"><div class="fenster-kopf"><h2 id="t-lassen">Kannst du dir sparen</h2></div><ul class="lassen">
+<li><span class="rot"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 7L7 17"/></svg></span><h3>Jeden Job auf höchste Gegenstandsstufe ziehen</h3><span class="warum">Auf Stufe 110 überträgt das Erweiterte Arsenal die Gegenstandsstufe ohnehin, nur ohne Materia.</span></li>
+<li><span class="rot"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 7L7 17"/></svg></span><h3>Material auf Verdacht teuer kaufen</h3><span class="warum">Welche Materialien Evercold braucht, weiß noch niemand.</span></li>
+</ul></section>
+<footer>
+  <div class="ornament"><span class="kristall" aria-hidden="true"></span><h2 style="font-size:22px">Mortys Welt</h2></div>
+  <p>Das ist eine inoffizielle Fan-Übersicht und kein Angebot von Square Enix. Alle Angaben stehen nach bestem Wissen auf dem Stand vom <span class="mono">10.11.2026</span>, und bis zum Launch kann sich noch einiges ändern, wie die Ampeln auf Abwarten zeigen.</p>
+  <p>Die Begriffe stehen so da wie im deutschen Client, geprüft gegen de.finalfantasyxiv.com, und das ganze Video dazu gibt es auf YouTube bei Mortys Welt. Wenn dir ein Tipp fehlt, schreib ihn gern in den Discord unter <a href="https://discord.gg/GVYpcej">discord.gg/GVYpcej</a>.</p>
+  <p>Alle Kanäle findest du auf <a href="https://mortys-welt.com/">mortys-welt.com</a>.</p>
+</footer>
+</main>
+
+<script>
+(function () {
+  var KEY = "mw-evercold-checkliste-v1";
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { state = {}; }
+  var boxes = Array.prototype.slice.call(document.querySelectorAll(".aufgabe input"));
+  var filter = "alle";
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function render() {
+    var done = 0;
+    boxes.forEach(function (b) {
+      var row = b.closest(".aufgabe"), id = row.dataset.id, on = !!state[id];
+      b.checked = on; row.classList.toggle("erledigt", on); if (on) done++;
+      var show = filter === "alle" || (filter === "offen" && !on) || row.dataset.ampel === filter;
+      row.classList.toggle("versteckt", !show);
+    });
+    document.querySelectorAll(".kapitel").forEach(function (k) {
+      var rows = k.querySelectorAll(".aufgabe"), n = 0, vis = 0;
+      rows.forEach(function (r) { if (r.classList.contains("erledigt")) n++; if (!r.classList.contains("versteckt")) vis++; });
+      k.querySelector("[data-zaehler]").textContent = n + " / " + rows.length;
+      k.classList.toggle("versteckt", vis === 0);
+    });
+    document.getElementById("erledigt-zahl").textContent = done;
+    document.getElementById("balken-fuellung").style.width = (done / boxes.length * 100) + "%";
+    document.getElementById("balken").setAttribute("aria-valuenow", done);
+    var m = "Noch nichts abgehakt, und das ist völlig in Ordnung, fang einfach mit einer Kleinigkeit an.";
+    if (boxes.length && done === boxes.length) m = "Alles abgehakt, du bist bereit für Evercold.";
+    else if (done * 2 >= boxes.length) m = "Mehr als die Hälfte steht schon, der Rest ist reine Kür.";
+    else if (done > 0) m = "Schon ein Anfang, den Rest kannst du in deinem Tempo abarbeiten.";
+    document.getElementById("motivation").textContent = m;
+  }
+  boxes.forEach(function (b) { b.addEventListener("change", function () { var id = b.closest(".aufgabe").dataset.id; if (b.checked) state[id] = 1; else delete state[id]; save(); render(); }); });
+  document.querySelectorAll("[data-filter]").forEach(function (btn) {
+    btn.addEventListener("click", function () { filter = btn.dataset.filter;
+      document.querySelectorAll("[data-filter]").forEach(function (o) { o.setAttribute("aria-pressed", o === btn ? "true" : "false"); }); render(); });
+  });
+  var conf = document.getElementById("bestaetigen");
+  document.getElementById("reset").addEventListener("click", function () { conf.hidden = false; document.getElementById("reset-nein").focus(); });
+  document.getElementById("reset-nein").addEventListener("click", function () { conf.hidden = true; });
+  document.getElementById("reset-ja").addEventListener("click", function () { state = {}; save(); conf.hidden = true; render(); });
+  var codeStatus = document.getElementById("code-status");
+  function say(msg, cls) { codeStatus.textContent = msg; codeStatus.className = "mitnehmen-status" + (cls ? " " + cls : ""); }
+  function makeCode() {
+    var ids = boxes.map(function (b) { return b.closest(".aufgabe").dataset.id; }).filter(function (id) { return state[id]; });
+    return "MW1:" + ids.join(",");
+  }
+  document.getElementById("code-kopieren").addEventListener("click", function () {
+    var code = makeCode(), out = document.getElementById("code-aus");
+    out.value = code; out.hidden = false;
+    function fallback() { out.focus(); out.select(); say("Kopieren hat nicht geklappt, aber der Code ist markiert und lässt sich von Hand kopieren.", "fehler"); }
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.writeText) { fallback(); return; }
+      navigator.clipboard.writeText(code).then(function () { say("Code kopiert, du kannst ihn jetzt auf dem anderen Gerät einfügen.", "ok"); }, fallback);
+    } catch (e) { fallback(); }
+  });
+  document.getElementById("code-uebernehmen").addEventListener("click", function () {
+    var raw = document.getElementById("code-ein").value.trim();
+    var m = /^MW1:([A-Za-z0-9_,-]*)$/.exec(raw);
+    if (!m) { say("Das sieht nicht nach einem gültigen Code aus, er beginnt mit MW1: und kommt aus dem Knopf Code kopieren.", "fehler"); return; }
+    var known = {}, next = {}, unknown = 0, n = 0;
+    boxes.forEach(function (b) { known[b.closest(".aufgabe").dataset.id] = 1; });
+    m[1].split(",").forEach(function (id) { if (!id) return; if (known[id]) { if (!next[id]) { next[id] = 1; n++; } } else unknown++; });
+    state = next; save(); render();
+    say(n + " Haken übernommen, dein bisheriger Stand wurde ersetzt" + (unknown ? " und " + unknown + " unbekannte Einträge ignoriert" : "") + ".", "ok");
+  });
+  render();
+})();
+</script>
+
+</body>
+</html>
