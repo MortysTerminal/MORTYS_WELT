@@ -24,6 +24,8 @@ body { margin: 0; color: var(--text); font-family: var(--sans); font-size: 18px;
   -webkit-font-smoothing: antialiased;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .seite { max-width: 760px; margin: 0 auto; padding-block: 48px 64px; display: flex; flex-direction: column; gap: 48px; }
+.seitenleiste, .inhalt { display: flex; flex-direction: column; gap: 48px; min-width: 0; }
+.kapitelnav { display: none; }
 h1, h2, h3 { font-weight: 800; font-variation-settings: "opsz" 32; letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
 h1 { font-size: 48px; line-height: 1.05; }
 h1 .akzent { color: var(--gelb); }
@@ -46,7 +48,7 @@ header { display: flex; flex-direction: column; gap: 16px; }
 
 /* Fenster */
 .fenster { background: var(--fenster); border-radius: 12px; box-shadow: var(--schatten); overflow: hidden; }
-.fenster-kopf { background: var(--kopf); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+.fenster-kopf { background: var(--kopf); padding: 12px 24px; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
   box-shadow: inset 0 -1px 0 rgba(245,192,124,.45); }
 .fenster-kopf h2 { font-size: 22px; line-height: 1.25; }
 .fenster-kopf .zaehler { color: var(--leise); font-size: 15px; white-space: nowrap; }
@@ -54,7 +56,7 @@ header { display: flex; flex-direction: column; gap: 16px; }
 
 /* Fortschritt */
 .fortschritt { display: flex; flex-direction: column; gap: 12px; }
-.balken { height: 12px; background: var(--eingabe); border-radius: 8px; overflow: hidden; }
+.balken { height: 12px; background: var(--kopf); border-radius: 8px; overflow: hidden; }
 .balken > span { display: block; height: 100%; width: 0%; background: var(--gelb); border-radius: 8px; transition: width .3s ease; }
 .fortschritt-zeile { display: flex; justify-content: space-between; align-items: center; gap: 8px 16px; flex-wrap: wrap; font-size: 15px; color: var(--leise); }
 .fortschritt-zeile strong { color: var(--text); font-weight: 700; }
@@ -69,12 +71,12 @@ header { display: flex; flex-direction: column; gap: 16px; }
 
 /* Fortschritt mitnehmen */
 .mitnehmen { background: var(--fenster); border-radius: 12px; box-shadow: var(--schatten); }
-.mitnehmen summary { cursor: pointer; padding: 12px 24px; min-height: 48px; display: flex; align-items: center; font-size: 16px; font-weight: 600; border-radius: 12px; }
+.mitnehmen summary { cursor: pointer; padding: 12px 24px; min-height: 48px; display: flex; align-items: center; font-size: 15px; font-weight: 700; border-radius: 12px; }
 .mitnehmen[open] summary { box-shadow: inset 0 -1px 0 var(--linie); border-radius: 12px 12px 0 0; }
 .mitnehmen-inhalt { padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
 .mitnehmen-inhalt p { font-size: 15px; color: var(--leise); max-width: 60ch; }
 .mitnehmen-zeile { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.mitnehmen-zeile label { font-size: 16px; font-weight: 600; width: 100%; }
+.mitnehmen-zeile label { font-size: 15px; font-weight: 700; width: 100%; }
 .mitnehmen-zeile input[type="text"] { flex: 1 1 220px; min-width: 0; font: inherit; font-size: 16px; color: var(--text); background: var(--eingabe);
   border: 0; border-radius: 8px; padding: 8px 12px; min-height: 40px; box-shadow: inset 0 0 0 2px var(--linie); }
 .mitnehmen-status { font-size: 15px; color: var(--leise); }
@@ -84,14 +86,39 @@ header { display: flex; flex-direction: column; gap: 16px; }
 
 .bestaetigen[hidden] { display: none; }
 
-/* Termine wie Zeitleiste */
-.termine { list-style: none; margin: 0; padding: 8px 24px 16px; display: flex; flex-direction: column; }
-.termin { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 4px 24px; padding: 12px 0; }
-.termin + .termin { box-shadow: inset 0 1px 0 var(--linie); }
-.termin .wann { color: var(--gelb); font-size: 16px; }
-.termin .was { font-weight: 700; }
-.termin .warum { color: var(--leise); font-size: 15px; grid-column: 2; }
-@media (max-width: 560px) { .termin { grid-template-columns: minmax(0,1fr); } .termin .warum { grid-column: 1; } }
+/* Termine: Zeitstrahl (Standard) oder Kalender, umschaltbar. Schmal steht der Zeitstrahl senkrecht, breit waagerecht. */
+.ansicht-wahl { display: flex; gap: 4px; }
+.ansicht-wahl .filter { background: var(--eingabe); box-shadow: none; }
+.ansicht-wahl .filter[aria-pressed="true"] { background: var(--gelb); }
+[data-ansicht][hidden] { display: none; }
+.zeitstrahl { list-style: none; margin: 0; padding: 8px 24px 16px; display: flex; flex-direction: column; }
+.zs { position: relative; display: grid; grid-template-columns: 6.5rem 16px minmax(0, 1fr); gap: 0 12px; padding: 8px 0; align-items: center; }
+.zs::before { content: ""; position: absolute; left: calc(6.5rem + 12px + 7px); top: 0; bottom: 0; width: 2px; background: var(--linie); }
+.zs:first-child::before { top: 50%; } .zs:last-child::before { bottom: 50%; }
+.zs .tag { color: var(--gelb); font-size: 15px; line-height: 24px; white-space: nowrap; }
+.zs .punkt { position: relative; z-index: 1; width: 16px; height: 16px; border-radius: 50%; background: var(--fenster); box-shadow: inset 0 0 0 2px var(--gelb); }
+.zs .kurz { font-weight: 700; line-height: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; }
+.zs .notiz { grid-column: 3; color: var(--leise); font-size: 15px; line-height: 1.4; }
+.zs.vorbei .tag, .zs.vorbei .kurz, .zs.vorbei .notiz { opacity: .7; }
+.zs.vorbei .punkt { background: var(--linie); box-shadow: none; }
+.zs.naechster .punkt { background: var(--gelb); box-shadow: none; }
+.bald { font-size: 15px; font-weight: 700; line-height: 24px; padding: 0 8px; border-radius: 4px; background: var(--gelb); color: var(--auf-akzent); white-space: nowrap; }
+
+.kalender { padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 12px; }
+.kal-vorher { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 24px; font-size: 15px; color: var(--leise); }
+.kal-vorher b { color: var(--text); }
+.kal-raster { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.kal-kopf { font-size: 15px; color: var(--leise); padding: 0 8px; }
+.kal-tag { background: var(--eingabe); border-radius: 8px; min-height: 48px; padding: 8px; display: flex; flex-direction: column; gap: 4px; font-size: 15px; line-height: 24px; color: var(--leise); }
+.kal-tag.leer { background: transparent; }
+.kal-tag.termin { background: var(--gelb); color: var(--auf-akzent); font-weight: 700; }
+.kal-tag.vorbei { opacity: .7; }
+.kal-tag.heute .mono { text-decoration: underline; text-underline-offset: 3px; }
+.kal-text { display: none; font-family: var(--sans); font-size: 15px; line-height: 1.25; color: var(--auf-akzent); }
+.kal-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+.kal-liste .mono { color: var(--gelb); display: inline-block; min-width: 6.5rem; }
+@media (max-width: 699px) { .kal-tag { align-items: center; justify-content: center; padding: 8px 0; } .kal-kopf { text-align: center; padding: 0; } }
+@media (min-width: 700px) { .kal-tag { min-height: 80px; } .kal-text { display: block; } .kal-liste { display: none; } }
 
 /* Ampel-Marker: Symbol plus Wort */
 .ampel { display: inline-flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 600; line-height: 24px; height: 24px; white-space: nowrap; }
@@ -111,8 +138,9 @@ header { display: flex; flex-direction: column; gap: 16px; }
 .aufgabe input:checked::after { opacity: 1; }
 .aufgabe label { cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 24px; }
 .aufgabe label h3 { line-height: 24px; }
-.aufgabe .beschreibung { grid-column: 2; color: var(--leise); font-size: 16px; }
-.aufgabe ul { grid-column: 2; margin: 4px 0 0; padding-left: 20px; color: var(--leise); font-size: 16px; display: flex; flex-direction: column; gap: 4px; }
+.aufgabe .beschreibung { grid-column: 2; color: var(--leise); font-size: 15px; max-width: 70ch; }
+.aufgabe ul { grid-column: 2; margin: 4px 0 0; padding-left: 16px; color: var(--leise); font-size: 15px; max-width: 70ch; display: flex; flex-direction: column; gap: 4px; }
+.aufgabe.erledigt .beschreibung, .aufgabe.erledigt ul, .aufgabe.erledigt .ampel { opacity: .7; }
 .aufgabe.erledigt label h3 { color: var(--leise); text-decoration: line-through; text-decoration-color: rgba(184,178,170,.6); }
 .versteckt { display: none; }
 
@@ -120,13 +148,59 @@ header { display: flex; flex-direction: column; gap: 16px; }
 .lassen { list-style: none; margin: 0; padding: 8px 24px 16px; display: flex; flex-direction: column; }
 .lassen li { padding: 12px 0; display: grid; grid-template-columns: auto minmax(0,1fr); gap: 4px 12px; }
 .lassen li + li { box-shadow: inset 0 1px 0 var(--linie); }
-.lassen .warum { grid-column: 2; color: var(--leise); font-size: 16px; }
+.lassen .warum { grid-column: 2; color: var(--leise); font-size: 15px; max-width: 70ch; }
 .lassen .rot { color: var(--falsch); display: flex; }
 
 footer { display: flex; flex-direction: column; gap: 12px; color: var(--leise); font-size: 15px; }
 footer p { max-width: 65ch; }
-@media (max-width: 480px) { h1 { font-size: 36px; } h2 { font-size: 24px; } .fenster-kopf, .aufgabe, .termine, .lassen { padding-left: 16px; padding-right: 16px; } }
+@media (max-width: 480px) { .fenster-kopf { flex-wrap: wrap; gap: 8px 16px; } h1 { font-size: 30px; } h2 { font-size: 22px; } .fenster-kopf, .aufgabe, .zeitstrahl, .kalender, .lassen { padding-left: 16px; padding-right: 16px; } }
 @media (prefers-reduced-motion: reduce) { .balken > span { transition: none; } }
+
+/* Breite Bildschirme: links eine feste Leiste mit Fortschritt, Filtern und Kapiteln, rechts der Inhalt.
+   Ab 1500 px stehen die Aufgaben zweispaltig. Trennlinien liegen unten und rechts und werden am Fensterrand abgeschnitten. */
+@media screen and (min-width: 1100px) {
+  html { scroll-behavior: smooth; }
+  body { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); }
+  .seite { max-width: 1720px; display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 0 48px; align-items: start; padding-block: 32px 64px; }
+  .seitenleiste { position: sticky; top: 0; max-height: 100vh; overflow-y: auto; gap: 16px; padding: 32px 12px; margin: -32px -12px 0; scrollbar-width: thin; }
+  .seitenleiste .zurueck { margin-bottom: 0; }
+  .inhalt { gap: 32px; }
+  h1 { font-size: 30px; white-space: nowrap; }
+  .lead { font-size: 15px; }
+  .seitenleiste .stand:not(#motivation) { display: none; }
+  .fortschritt { display: contents; }
+  .mitnehmen { order: 2; }
+  .fortschritt-zeile { flex-direction: column; align-items: flex-start; }
+  .legende { display: none; }
+  .steuerung { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .steuerung .zuruecksetzen, .bestaetigen { grid-column: 1 / -1; justify-self: start; }
+  .steuerung .zuruecksetzen { margin-left: 0; padding-left: 0; }
+  .bestaetigen { justify-content: flex-start; }
+  .fenster, .mitnehmen { scroll-margin-top: 32px; }
+  .fenster-kopf h2 { scroll-margin-top: 48px; }
+
+  .kapitelnav { display: flex; flex-direction: column; order: 1; margin: 8px -12px 0; }
+  .kapitelnav a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; padding: 8px 12px; border-radius: 8px;
+    color: var(--text); text-decoration: none; font-size: 15px; line-height: 24px; }
+  .kapitelnav a:hover { background: var(--fenster); }
+  .kapitelnav a.aktiv { background: var(--fenster); color: var(--gelb); font-weight: 700; }
+  .kapitelnav .zaehler { color: var(--leise); font-size: 15px; font-weight: 400; white-space: nowrap; }
+  .kapitelnav a.fertig .zaehler { color: var(--richtig); }
+  .kapitelnav a.leer { opacity: .45; }
+
+}
+@media screen and (min-width: 1500px) {
+  .zeitstrahl { flex-direction: row; padding: 24px; }
+  .zs { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 0 16px 0 0; }
+  .zs::before, .zs:first-child::before, .zs:last-child::before { left: 0; right: 0; top: 39px; bottom: auto; width: auto; height: 2px; }
+  .zs:last-child::before { right: 50%; }
+  .zs .kurz { line-height: 1.3; }
+  .fenster-inhalt { padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0 -1px -1px 0; }
+  .aufgabe, .aufgabe + .aufgabe { padding: 24px; align-content: start; box-shadow: inset 0 -1px 0 var(--linie), inset -1px 0 0 var(--linie); }
+  .lassen { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; padding: 8px 24px; }
+  .lassen li, .lassen li + li { box-shadow: none; align-content: start; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 /* Druckfassung: heller Spickzettel, Kontrollkästchen als leere Kästchen */
 @media print {
@@ -139,21 +213,24 @@ footer p { max-width: 65ch; }
   h1 { font-size: 26pt; }
   h2, .fenster-kopf h2 { font-size: 14pt; break-after: avoid; }
   h3 { font-size: 11pt; }
-  .lead, .stand, .aufgabe .beschreibung, .aufgabe ul, .termin .warum, .lassen .warum, footer { font-size: 10pt; color: #333; }
+  .lead, .stand, .aufgabe .beschreibung, .aufgabe ul, .zs .notiz, .lassen .warum, footer { font-size: 10pt; color: #333; }
   a { color: #000; }
   .fenster { background: #fff; box-shadow: none; border: 1px solid #aaa; border-radius: 6px; overflow: visible; }
   .fenster-kopf { background: #fff; box-shadow: none; border-bottom: 1px solid #aaa; padding: 8px 14px; break-after: avoid; }
   .aufgabe { break-inside: avoid; padding: 8px 14px; gap: 2px 12px; }
-  .aufgabe + .aufgabe, .termin + .termin, .lassen li + li { box-shadow: none; border-top: 1px solid #ddd; }
-  .termin, .lassen li { break-inside: avoid; }
-  .termine, .lassen { padding: 4px 14px 8px; }
+  .aufgabe + .aufgabe, .lassen li + li { box-shadow: none; border-top: 1px solid #ddd; }
+  .zs, .lassen li { break-inside: avoid; }
+  .zeitstrahl, .lassen { padding: 4px 14px 8px; }
+  .ansicht-wahl, .kalender, .bald { display: none !important; }
+  .zeitstrahl[hidden] { display: flex !important; }
+  .zs.vorbei .tag, .zs.vorbei .kurz, .zs.vorbei .notiz { opacity: 1; }
   .aufgabe input { background: #fff; box-shadow: none; border: 1.5px solid #000; border-radius: 3px; width: 16px; height: 16px; margin-top: 4px; }
   .aufgabe input::after { border-color: #000; width: 9px; height: 5px; border-width: 0 0 2px 2px; }
   .aufgabe input:checked { background: #fff; box-shadow: none; }
   .aufgabe { grid-template-columns: 16px minmax(0, 1fr); }
   .aufgabe.erledigt label h3 { color: #000; text-decoration: none; }
-  .termin .wann { color: #000; font-size: 10pt; }
-  .balken, .steuerung, .mitnehmen, #motivation, .fortschritt-zeile > span:first-child { display: none !important; }
+  .zs .tag { color: #000; font-size: 10pt; }
+  .balken, .steuerung, .mitnehmen, .kapitelnav, #motivation, .fortschritt-zeile > span:first-child { display: none !important; }
   .fortschritt-zeile { justify-content: flex-start; }
   .versteckt { display: none !important; }
 }
@@ -178,6 +255,7 @@ footer p { max-width: 65ch; }
 </head>
 <body>
 <main class="seite">
+<div class="seitenleiste">
 <a class="zurueck" href="../"><img src="../favicon.svg" width="32" height="32" alt=""><span>Mortys Welt</span></a>
 <header>
   <h1>Bereit für <span class="akzent">Evercold</span></h1>
@@ -217,19 +295,67 @@ footer p { max-width: 65ch; }
     </div>
   </details>
 </section>
+<nav class="kapitelnav" aria-label="Kapitel">
+  <a href="#t-termine" data-nav="termine"><span>Termine bis zum Launch</span></a>
+  <a href="#t-jeder" data-nav="jeder"><span>Das sollte jeder erledigen</span><span class="zaehler mono" data-navzaehler="jeder">0 / 9</span></a>
+  <a href="#t-routine" data-nav="routine"><span>Routine auf Vorrat</span><span class="zaehler mono" data-navzaehler="routine">0 / 10</span></a>
+  <a href="#t-ausruestung" data-nav="ausruestung"><span>Ausrüstung und Allagische Steine</span><span class="zaehler mono" data-navzaehler="ausruestung">0 / 5</span></a>
+  <a href="#t-gil" data-nav="gil"><span>Gil zum Launch</span><span class="zaehler mono" data-navzaehler="gil">0 / 7</span></a>
+  <a href="#t-handwerk" data-nav="handwerk"><span>Handwerker und Sammler</span><span class="zaehler mono" data-navzaehler="handwerk">0 / 7</span></a>
+  <a href="#t-raid" data-nav="raid"><span>Für Raider</span><span class="zaehler mono" data-navzaehler="raid">0 / 3</span></a>
+  <a href="#t-kampf" data-nav="kampf"><span>Neues Kampfsystem</span><span class="zaehler mono" data-navzaehler="kampf">0 / 2</span></a>
+  <a href="#t-lassen" data-nav="lassen"><span>Kannst du dir sparen</span></a>
+</nav>
+</div>
+<div class="inhalt">
 
-<section aria-labelledby="t-termine" class="fenster">
-  <div class="fenster-kopf"><h2 id="t-termine">Termine bis zum Launch</h2></div>
-  <ol class="termine">
-<li class="termin"><span class="wann mono">seit Mi 04.11.2026</span><span class="was">Vorbestellung offen</span><span class="warum">Halone-Ohrring und Begleiter Köttr-Puppe gibt es sofort, Früher Zugang folgt im Februar</span></li>
-<li class="termin"><span class="wann mono">seit Di 10.11.2026</span><span class="was">Matching innerhalb derselben Region (Patch 7.58)</span><span class="warum">gilt in Europa für Inhaltssuche und Gruppensuche</span></li>
-<li class="termin"><span class="wann mono">Anfang Dezember 2026</span><span class="was">Benchmark mit Charakter-Editor</span><span class="warum">dann siehst du, ob dein PC Evercold packt</span></li>
-<li class="termin"><span class="wann mono">ca. 01.02.2027</span><span class="was">Keine Freibriefe mehr annehmen</span><span class="warum">damit die Freibrief-Vollmachten bis zum Launch voll sind</span></li>
-<li class="termin"><span class="wann mono">Di 09.02.2027</span><span class="was">Khloes Abenteueralbum holen (mit Früher Zugang)</span><span class="warum">du füllst es schon, gibst es aber noch nicht ab</span></li>
-<li class="termin"><span class="wann mono">Di 16.02.2027, ab 9 Uhr</span><span class="was">Aktuelle Agenda vorbereiten</span><span class="warum">ohne Früher Zugang holst du jetzt erst das Album</span></li>
-<li class="termin"><span class="wann mono">Fr 19.02.2027, ca. 10 Uhr</span><span class="was">Früher Zugang</span><span class="warum">jetzt gibst du das Album ab, löst die Agenda ein und schickst die Gehilfen los</span></li>
-<li class="termin"><span class="wann mono">Di 23.02.2027</span><span class="was">Evercold erscheint</span><span class="warum">ohne Früher Zugang gibst du das Album jetzt ab</span></li>
-</ol></section>
+<section aria-labelledby="t-termine" class="fenster" data-abschnitt="termine">
+  <div class="fenster-kopf"><h2 id="t-termine">Termine bis zum Launch</h2>
+    <div class="ansicht-wahl" role="group" aria-label="Ansicht der Termine">
+      <button class="filter" type="button" data-ansicht-knopf="zeitstrahl" aria-pressed="true">Zeitstrahl</button>
+      <button class="filter" type="button" data-ansicht-knopf="kalender" aria-pressed="false">Kalender</button>
+    </div></div>
+  <ol class="zeitstrahl" data-ansicht="zeitstrahl">
+<li class="zs" data-datum="2026-11-04"><span class="tag mono">Mi 04.11.</span><span class="punkt" aria-hidden="true"></span><span class="kurz">Vorbestellen</span><span class="notiz">Halone-Ohrring gibt es sofort</span></li>
+<li class="zs" data-datum="2026-11-10"><span class="tag mono">Di 10.11.</span><span class="punkt" aria-hidden="true"></span><span class="kurz">Patch 7.58</span><span class="notiz">Matching innerhalb derselben Region</span></li>
+<li class="zs" data-datum="2026-12-01" data-ca><span class="tag mono">Anfang Dez.</span><span class="punkt" aria-hidden="true"></span><span class="kurz">Benchmark</span><span class="notiz">mit Charakter-Editor</span></li>
+<li class="zs" data-datum="2027-02-01" data-ca><span class="tag mono">ca. 01.02.</span><span class="punkt" aria-hidden="true"></span><span class="kurz">Keine Freibriefe mehr</span><span class="notiz">Vollmachten laufen voll</span></li>
+<li class="zs" data-datum="2027-02-09"><span class="tag mono">Di 09.02.</span><span class="punkt" aria-hidden="true"></span><span class="kurz">Album holen</span><span class="notiz">nur mit Früher Zugang</span></li>
+<li class="zs" data-datum="2027-02-16"><span class="tag mono">Di 16.02.</span><span class="punkt" aria-hidden="true"></span><span class="kurz">Agenda vorbereiten</span><span class="notiz">ab 9 Uhr, sonst jetzt Album holen</span></li>
+<li class="zs" data-datum="2027-02-19"><span class="tag mono">Fr 19.02.</span><span class="punkt" aria-hidden="true"></span><span class="kurz">Früher Zugang</span><span class="notiz">ca. 10 Uhr: Album, Agenda, Gehilfen</span></li>
+<li class="zs" data-datum="2027-02-23"><span class="tag mono">Di 23.02.</span><span class="punkt" aria-hidden="true"></span><span class="kurz">Evercold erscheint</span><span class="notiz">Album abgeben ohne Früher Zugang</span></li>
+</ol>
+<div class="kalender" data-ansicht="kalender" hidden><ul class="kal-vorher"><li><b>Vorbestellen</b> Mi 04.11.</li><li><b>Patch 7.58</b> Di 10.11.</li><li><b>Benchmark</b> Anfang Dez.</li></ul><h3>Februar 2027</h3><div class="kal-raster">
+<span class="kal-kopf" aria-hidden="true">Mo</span><span class="kal-kopf" aria-hidden="true">Di</span><span class="kal-kopf" aria-hidden="true">Mi</span><span class="kal-kopf" aria-hidden="true">Do</span><span class="kal-kopf" aria-hidden="true">Fr</span><span class="kal-kopf" aria-hidden="true">Sa</span><span class="kal-kopf" aria-hidden="true">So</span>
+<span class="kal-tag termin" data-datum="2027-02-01"><span class="mono">01</span><span class="kal-text">Keine Freibriefe mehr</span></span>
+<span class="kal-tag" data-datum="2027-02-02"><span class="mono">02</span></span>
+<span class="kal-tag" data-datum="2027-02-03"><span class="mono">03</span></span>
+<span class="kal-tag" data-datum="2027-02-04"><span class="mono">04</span></span>
+<span class="kal-tag" data-datum="2027-02-05"><span class="mono">05</span></span>
+<span class="kal-tag" data-datum="2027-02-06"><span class="mono">06</span></span>
+<span class="kal-tag" data-datum="2027-02-07"><span class="mono">07</span></span>
+<span class="kal-tag" data-datum="2027-02-08"><span class="mono">08</span></span>
+<span class="kal-tag termin" data-datum="2027-02-09"><span class="mono">09</span><span class="kal-text">Album holen</span></span>
+<span class="kal-tag" data-datum="2027-02-10"><span class="mono">10</span></span>
+<span class="kal-tag" data-datum="2027-02-11"><span class="mono">11</span></span>
+<span class="kal-tag" data-datum="2027-02-12"><span class="mono">12</span></span>
+<span class="kal-tag" data-datum="2027-02-13"><span class="mono">13</span></span>
+<span class="kal-tag" data-datum="2027-02-14"><span class="mono">14</span></span>
+<span class="kal-tag" data-datum="2027-02-15"><span class="mono">15</span></span>
+<span class="kal-tag termin" data-datum="2027-02-16"><span class="mono">16</span><span class="kal-text">Agenda vorbereiten</span></span>
+<span class="kal-tag" data-datum="2027-02-17"><span class="mono">17</span></span>
+<span class="kal-tag" data-datum="2027-02-18"><span class="mono">18</span></span>
+<span class="kal-tag termin" data-datum="2027-02-19"><span class="mono">19</span><span class="kal-text">Früher Zugang</span></span>
+<span class="kal-tag" data-datum="2027-02-20"><span class="mono">20</span></span>
+<span class="kal-tag" data-datum="2027-02-21"><span class="mono">21</span></span>
+<span class="kal-tag" data-datum="2027-02-22"><span class="mono">22</span></span>
+<span class="kal-tag termin" data-datum="2027-02-23"><span class="mono">23</span><span class="kal-text">Evercold erscheint</span></span>
+<span class="kal-tag" data-datum="2027-02-24"><span class="mono">24</span></span>
+<span class="kal-tag" data-datum="2027-02-25"><span class="mono">25</span></span>
+<span class="kal-tag" data-datum="2027-02-26"><span class="mono">26</span></span>
+<span class="kal-tag" data-datum="2027-02-27"><span class="mono">27</span></span>
+<span class="kal-tag" data-datum="2027-02-28"><span class="mono">28</span></span>
+</div><ul class="kal-liste"><li><span class="mono">ca. 01.02.</span><b>Keine Freibriefe mehr</b></li><li><span class="mono">Di 09.02.</span><b>Album holen</b></li><li><span class="mono">Di 16.02.</span><b>Agenda vorbereiten</b></li><li><span class="mono">Fr 19.02.</span><b>Früher Zugang</b></li><li><span class="mono">Di 23.02.</span><b>Evercold erscheint</b></li></ul></div></section>
 <section class="fenster kapitel" aria-labelledby="t-jeder" data-kapitel="jeder"><div class="fenster-kopf"><h2 id="t-jeder">Das sollte jeder erledigen</h2><span class="zaehler mono" data-zaehler="jeder">0 / 9</span></div><div class="fenster-inhalt">
 <div class="aufgabe" data-ampel="g" data-id="msq"><input type="checkbox" id="cb-msq" aria-describedby="b-msq"><label for="cb-msq"><h3>Hauptszenario bis Patch 7.56 abschließen</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-msq">Evercold setzt genau dort an, sodass du ohne Lücken in die Geschichte einsteigst.</p></div>
 <div class="aufgabe" data-ampel="g" data-id="alt"><input type="checkbox" id="cb-alt" aria-describedby="b-alt"><label for="cb-alt"><h3>Fehlende Dungeons, Prüfungen und Raids freischalten</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-alt">Vor einer Erweiterung kommen viele Spieler zurück, weshalb die Warteschlangen gar nicht so leer sind und seit Patch 7.58 zusätzlich das Matching innerhalb derselben Region greift.</p></div>
@@ -287,7 +413,7 @@ footer p { max-width: 65ch; }
 <div class="aufgabe" data-ampel="y" data-id="menues"><input type="checkbox" id="cb-menues" aria-describedby="b-menues"><label for="cb-menues"><h3>Kommandomenüs erst später planen</h3><span class="ampel ampel-gelb"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Abwarten</span></span></label><p class="beschreibung" id="b-menues">Warte die Live-Sendung ab, in der alle Jobs vorgestellt werden, und plane danach zum Beispiel mit Webseiten wie XIVBars.</p><ul><li>Jeder Job hat zwei Spielweisen, Reborn-Modus und Evolution-Modus, außer Bastion und Zephyr, die es nur im Evolution-Modus gibt</li></ul></div>
 <div class="aufgabe" data-ampel="g" data-id="hausaufgabe"><input type="checkbox" id="cb-hausaufgabe" aria-describedby="b-hausaufgabe"><label for="cb-hausaufgabe"><h3>Hausaufgabe: Final Fantasy VII und Evangelion</h3><span class="ampel ampel-gruen"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Lohnt sich</span></span></label><p class="beschreibung" id="b-hausaufgabe">Jenseits des Lebensstroms kommt mit Evercold und EVANGELION - Ghosts of Desire mit Patch 8.1, da schadet es nicht, die Vorlagen vorher zu kennen.</p></div>
 </div></section>
-<section class="fenster" aria-labelledby="t-lassen"><div class="fenster-kopf"><h2 id="t-lassen">Kannst du dir sparen</h2></div><ul class="lassen">
+<section class="fenster" aria-labelledby="t-lassen" data-abschnitt="lassen"><div class="fenster-kopf"><h2 id="t-lassen">Kannst du dir sparen</h2></div><ul class="lassen">
 <li><span class="rot"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 7L7 17"/></svg></span><h3>Jeden Job auf höchste Gegenstandsstufe ziehen</h3><span class="warum">Auf Stufe 110 überträgt das Erweiterte Arsenal die Gegenstandsstufe ohnehin, nur ohne Materia.</span></li>
 <li><span class="rot"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 7L7 17"/></svg></span><h3>Material auf Verdacht teuer kaufen</h3><span class="warum">Welche Materialien Evercold braucht, weiß noch niemand.</span></li>
 </ul></section>
@@ -297,6 +423,7 @@ footer p { max-width: 65ch; }
   <p>Die Begriffe stehen so da wie im deutschen Client, geprüft gegen de.finalfantasyxiv.com, und das ganze Video dazu gibt es auf YouTube bei Mortys Welt. Wenn dir ein Tipp fehlt, schreib ihn gern in den Discord unter <a href="https://discord.gg/GVYpcej">discord.gg/GVYpcej</a>.</p>
   <p>Alle Kanäle findest du auf <a href="https://mortys-welt.com/">mortys-welt.com</a>.</p>
 </footer>
+</div>
 </main>
 
 <script>
@@ -320,6 +447,8 @@ footer p { max-width: 65ch; }
       rows.forEach(function (r) { if (r.classList.contains("erledigt")) n++; if (!r.classList.contains("versteckt")) vis++; });
       k.querySelector("[data-zaehler]").textContent = n + " / " + rows.length;
       k.classList.toggle("versteckt", vis === 0);
+      var nz = document.querySelector('[data-navzaehler="' + k.dataset.kapitel + '"]');
+      if (nz) { nz.textContent = n + " / " + rows.length; nz.parentNode.classList.toggle("fertig", n === rows.length); nz.parentNode.classList.toggle("leer", vis === 0); }
     });
     document.getElementById("erledigt-zahl").textContent = done;
     document.getElementById("balken-fuellung").style.width = (done / boxes.length * 100) + "%";
@@ -365,6 +494,41 @@ footer p { max-width: 65ch; }
     say(n + " Haken übernommen, dein bisheriger Stand wurde ersetzt" + (unknown ? " und " + unknown + " unbekannte Einträge ignoriert" : "") + ".", "ok");
   });
   render();
+  // Termine: Vergangenes abblenden, den nächsten Termin markieren, Ansicht umschalten und merken
+  var jetzt = new Date(), heute = jetzt.getFullYear() + "-" + ("0" + (jetzt.getMonth() + 1)).slice(-2) + "-" + ("0" + jetzt.getDate()).slice(-2), gefunden = false;
+  document.querySelectorAll(".zs, .kal-tag[data-datum]").forEach(function (el) {
+    var dt = el.dataset.datum;
+    if (dt < heute) { el.classList.add("vorbei"); return; }
+    if (dt === heute) el.classList.add("heute");
+    if (el.classList.contains("zs") && !gefunden) {
+      gefunden = true; el.classList.add("naechster");
+      if (!el.hasAttribute("data-ca")) {
+        var t = dt.split("-"), n = Math.round((new Date(+t[0], t[1] - 1, +t[2]) - new Date(jetzt.getFullYear(), jetzt.getMonth(), jetzt.getDate())) / 864e5);
+        var b = document.createElement("span"); b.className = "bald"; b.textContent = n === 0 ? "heute" : n === 1 ? "morgen" : "in " + n + " Tagen";
+        el.querySelector(".kurz").appendChild(b);
+      }
+    }
+  });
+  var AKEY = "mw-evercold-termine-ansicht";
+  function ansicht(name) {
+    document.querySelectorAll("[data-ansicht]").forEach(function (el) { el.hidden = el.dataset.ansicht !== name; });
+    document.querySelectorAll("[data-ansicht-knopf]").forEach(function (k) { k.setAttribute("aria-pressed", k.dataset.ansichtKnopf === name ? "true" : "false"); });
+  }
+  document.querySelectorAll("[data-ansicht-knopf]").forEach(function (k) { k.addEventListener("click", function () { ansicht(k.dataset.ansichtKnopf); try { localStorage.setItem(AKEY, k.dataset.ansichtKnopf); } catch (e) {} }); });
+  try { if (localStorage.getItem(AKEY) === "kalender") ansicht("kalender"); } catch (e) {}
+  // Leiste: markiert das Kapitel, das gerade oben im Fenster steht
+  var links = Array.prototype.slice.call(document.querySelectorAll(".kapitelnav a"));
+  var ziele = links.map(function (a) { var h = document.getElementById(a.getAttribute("href").slice(1)); return h ? h.closest("section") : null; });
+  var wartet = false;
+  function spion() {
+    wartet = false; var akt = 0;
+    ziele.forEach(function (z, i) { if (z && z.offsetParent !== null && z.getBoundingClientRect().top <= 140) akt = i; });
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) { for (var i = ziele.length - 1; i >= 0; i--) { if (ziele[i] && ziele[i].offsetParent !== null && ziele[i].getBoundingClientRect().top < window.innerHeight) { akt = Math.max(akt, i); break; } } }
+    links.forEach(function (a, i) { if (i === akt) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current"); a.classList.toggle("aktiv", i === akt); });
+  }
+  window.addEventListener("scroll", function () { if (!wartet) { wartet = true; requestAnimationFrame(spion); } }, { passive: true });
+  window.addEventListener("resize", spion);
+  spion();
 })();
 </script>
 
