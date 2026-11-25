@@ -144,10 +144,31 @@
   document.addEventListener('pointerleave', (e) => { const el = kind(e.target); if (el && e.target === el) let_go(el); }, true);
   const releaseAll = () => { held.forEach(let_go); held.clear(); };
   addEventListener('blur', releaseAll); document.addEventListener('visibilitychange', releaseAll);
+  // A link that opens a new tab waits a moment, so the reaction can be seen before the tab takes over.
+  // 450 ms stays well inside the time browsers still count the click as the user's (about one second),
+  // so the popup blocker lets the tab through. Modified clicks and reduced motion open at once, as usual.
+  const DELAY = 450;
+  const pending = new WeakSet();
+  function holdLink(e, el) {
+    if (el.tagName !== 'A' || el.target !== '_blank' || !el.href || fx.calm) return false;
+    if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.defaultPrevented) return false;
+    e.preventDefault();
+    if (pending.has(el)) return true;   // a double click opens the tab only once
+    pending.add(el);
+    setTimeout(() => {
+      pending.delete(el);
+      const a = document.createElement('a');   // same target and rel as the original link
+      a.href = el.href; a.target = '_blank'; a.rel = el.rel || 'noopener noreferrer';
+      a.click();
+    }, DELAY);
+    return true;
+  }
   document.addEventListener('click', (e) => {
     const el = kind(e.target); if (!el || off(el)) return;
     const k = el.dataset.sakuga;
+    if (k === 'pop' && pending.has(el)) { if (el.tagName === 'A') e.preventDefault(); return; }
     if (k === 'hit') hit(el); else if (k === 'tap') tap(el); else if (k === 'pop') pop(el);
+    holdLink(e, el);
   }, true);
   document.addEventListener('change', (e) => { const el = e.target; if (el.matches && el.matches('input[type=checkbox][data-sakuga=check]')) check(el); }, true);
   document.addEventListener('input', (e) => { const el = e.target; if (el.matches && el.matches('input[data-sakuga=type], textarea[data-sakuga=type]')) type(el, e); }, true);
