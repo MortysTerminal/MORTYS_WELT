@@ -80,13 +80,13 @@
 
   .answer-row{display:flex;gap:11px;margin-top:24px;flex-wrap:wrap}
   input[type=text]{flex:1;min-width:190px;font-family:'Inter';font-weight:600;font-size:1.15rem;color:var(--txt);
-    background:rgba(0,0,0,.32);border:2px solid var(--line);border-radius:13px;padding:14px 17px;outline:none;transition:.18s}
+    background:rgba(0,0,0,.32);border:2px solid var(--line);border-radius:13px;padding:14px 17px;outline:none;transition:border-color .18s,box-shadow .18s,background .18s}
   input::placeholder{color:rgba(237,237,244,.30)}
   input:focus{border-color:var(--gelb);box-shadow:0 0 0 4px var(--gelb-soft)}
   input.wrong{border-color:var(--no);animation:shake .42s}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
 
-  button{font-family:'Inter';cursor:pointer;border:none;transition:.16s}
+  button{font-family:'Inter';cursor:pointer;border:none;transition:background .16s,color .16s,box-shadow .16s,border-color .16s,transform .16s,opacity .16s}
   .btn{font-weight:800;font-size:1.02rem;color:#202020;background:var(--gelb);
     padding:14px 26px;border-radius:13px;box-shadow:0 8px 22px rgba(245,192,124,.26)}
   .btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(245,192,124,.36)}
@@ -157,7 +157,7 @@
   <div class="panel center" id="startCard">
     <div class="riddle center" style="margin-bottom:0">Sechs Rätsel. Sechs Koordinaten. Eine Lösung.</div>
     <p class="lead">Diese Station sendet ein verschlüsseltes Wort – aber nur Stück für Stück. Habt ihr alle sechs, übersetzt ihr es in das Lösungswort. Dies muss vom Chat gelöst werden. </p>
-    <button class="btn" id="startBtn"><Samp></Samp>Starten</button>
+    <button class="btn" data-sakuga="hit" id="startBtn"><Samp></Samp>Starten</button>
   </div>
 
   <!-- GAME -->
@@ -166,14 +166,14 @@
     <p class="riddle" id="riddleText"></p>
 
     <div class="answer-row">
-      <input type="text" id="answer" placeholder="Antwort des Chats…" autocomplete="off" spellcheck="false">
-      <button class="btn" id="checkBtn">Senden</button>
+      <input type="text" data-sakuga="type" id="answer" placeholder="Antwort des Chats…" autocomplete="off" spellcheck="false">
+      <button class="btn" data-sakuga="hit" id="checkBtn">Senden</button>
     </div>
 
     <div class="feedback" id="feedback"></div>
 
     <div class="meta">
-      <button class="btn-hint" id="hintBtn">Tipp anfordern</button>
+      <button class="btn-hint" data-sakuga="tap" id="hintBtn">Tipp anfordern</button>
       <span class="kbd">↵ Enter = Senden</span>
     </div>
     <div class="hint" id="hint"></div>
@@ -198,7 +198,7 @@
   </div>
 
   <footer>
-    MORTYS WELT · Funkstation &nbsp;·&nbsp; <button class="reset" id="resetBtn">zurücksetzen</button>
+    MORTYS WELT · Funkstation &nbsp;·&nbsp; <button class="reset" data-sakuga="tap" id="resetBtn">zurücksetzen</button>
   </footer>
 </div>
 
@@ -288,6 +288,7 @@ function check(){
   const ok=r.accept.some(a=>norm(a)===v);
   if(ok){
     feedback.className="feedback ok"; feedback.textContent="✓ "+r.found;
+    if(window.MWSakuga) MWSakuga.success(answer);
     got.push(r.coord);
     const cell=$("c"+(got.length-1));
     if(cell){cell.textContent=r.coord;cell.classList.add("filled");}
@@ -296,10 +297,12 @@ function check(){
   } else {
     feedback.className="feedback no"; feedback.textContent="✗ Kein klares Signal – nochmal!";
     answer.classList.add("wrong"); setTimeout(()=>answer.classList.remove("wrong"),450);
+    if(window.MWSakuga) MWSakuga.fail(answer);
   }
 }
 
 function winScreen(){
+  if(window.MWSakuga) setTimeout(()=>MWSakuga.big(winCard),120);
   gameCard.classList.add("hidden"); winCard.classList.remove("hidden");
   $("codeline").textContent=got.join(" ");
   sub.innerHTML='// Signal vollständig empfangen <span class="blink">_</span>';
@@ -354,5 +357,7 @@ answer.addEventListener("keydown",e=>{if(e.key==="Enter")check();});
 /* ───────── Init ───────── */
 buildProgress(); buildCells(); makeStars();
 </script>
+<script src="../sakuga/sakuga-core.js"></script>
+<script src="../sakuga/mw-sakuga.js"></script>
 </body>
 </html>

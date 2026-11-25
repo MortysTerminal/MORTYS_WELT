@@ -145,14 +145,14 @@
                 <p class="signal-help" id="help">Gib die vollständige entschlüsselte Nachricht ein.</p>
 
                 <form id="form" autocomplete="off">
-                    <input id="code" type="text" inputmode="text" autocomplete="off"
+                    <input id="code" data-sakuga="type" type="text" inputmode="text" autocomplete="off"
                            autocapitalize="off" spellcheck="false" placeholder="· · · · ·"
                            aria-label="Entschlüsselte Nachricht">
                     <span id="sep" aria-hidden="true" style="display:none">✎</span>
-                    <input id="letter" type="password" inputmode="text" autocomplete="off"
+                    <input id="letter" data-sakuga="type" type="password" inputmode="text" autocomplete="off"
                            autocapitalize="characters" spellcheck="false" maxlength="1"
                            placeholder="●" aria-label="Aufgemalter Buchstabe vom Paket" style="display:none">
-                    <button id="send" type="submit">Senden</button>
+                    <button id="send" type="submit" data-sakuga="hit">Senden</button>
                 </form>
                 <p class="signal-error" id="err" role="alert"></p>
             </section>
@@ -399,6 +399,7 @@
         await wait(reduce ? 0 : 600);
         waveState = "locked"; statusEl.textContent = "» identität bestätigt";
         view.innerHTML = html; view.classList.add("revealed");
+        if (window.MWSakuga) setTimeout(() => MWSakuga.big(view), 150);
         const eb = view.querySelector("[data-scramble]");
         if (eb) scramble(eb, eb.textContent, 900);
         fireConfetti();
@@ -432,6 +433,7 @@
                 waveState = "error"; statusEl.textContent = "» kein empfang";
                 showMsg(lines[Math.min(wrongCount - 1, lines.length - 1)], false);
                 send.disabled = false; send.textContent = "Senden"; jiggle();
+                if (window.MWSakuga) MWSakuga.fail(code);
                 setTimeout(() => { if (waveState === "error") { waveState = "idle"; statusEl.innerHTML = SLUG_IDLE; } }, 1400);
             }
             return;
@@ -460,6 +462,7 @@
             waveState = "error"; statusEl.textContent = "» identität abgelehnt";
             showMsg(pl[Math.min(pinTries - 1, pl.length - 1)], false);
             send.disabled = false; send.textContent = "Verifizieren"; jiggle();
+            if (window.MWSakuga) MWSakuga.fail(send);
             setTimeout(() => { if (waveState === "error") { waveState = "idle"; statusEl.textContent = "» identität?"; } }, 1600);
         }
     });
@@ -487,5 +490,7 @@
     console.log("%c» Konsole offen, Erwartungen niedrig.", "color:#F5C07C;font-size:14px;font-weight:700");
     console.log("%cHier gibt es keinen Code zu finden, nur AES-256-GCM und meinen Sarkasmus. sudo geh zurueck in den Chat. - M.", "color:#F09346");
     </script>
+<script src="../sakuga/sakuga-core.js"></script>
+<script src="../sakuga/mw-sakuga.js"></script>
 </body>
 </html>

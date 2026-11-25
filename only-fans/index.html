@@ -19,7 +19,7 @@
         </div>
     </noscript>
 
-    <button type="button" id="give-up" class="give-up">Ich gebe auf</button>
+    <button type="button" id="give-up" class="give-up" data-sakuga="tap">Ich gebe auf</button>
 
     <main id="main">
         <!-- Stage 1: Temperaturabfrage -->
@@ -28,8 +28,8 @@
                 <h2 id="stage-1-title" tabindex="-1" data-focus-target>Bist du über 18 Grad?</h2>
                 <p>Diese Seite enthält Inhalte, die nur bei Zimmertemperatur angesehen werden dürfen.</p>
                 <div class="gate-actions">
-                    <button type="button" id="gate-yes">Ja, mir ist warm</button>
-                    <button type="button" id="gate-no">Nein, ich friere</button>
+                    <button type="button" id="gate-yes" data-sakuga="hit">Ja, mir ist warm</button>
+                    <button type="button" id="gate-no" data-sakuga="tap">Nein, ich friere</button>
                 </div>
                 <p id="gate-message" class="gate-message" aria-live="polite"></p>
             </div>
@@ -52,7 +52,7 @@
                 <h1 id="stage-3-title" tabindex="-1" data-focus-target class="reveal-title">ONLY FANS</h1>
                 <p class="reveal-tagline">Hier gibt es ausschließlich Lüfter.</p>
                 <p class="reveal-sub">Ungefiltert und nur für dich freigeschaltet, auch wenn der Ladebalken dabei geschummelt hat.</p>
-                <button type="button" id="reveal-next">Weiter zur Galerie</button>
+                <button type="button" id="reveal-next" data-sakuga="hit">Weiter zur Galerie</button>
             </div>
         </section>
 
@@ -63,10 +63,10 @@
             <p id="obstacle-timer" class="obstacle-timer" aria-live="polite"></p>
 
             <div id="obstacle-field" class="obstacle-field">
-                <button type="button" id="obstacle-decoy-1" class="obstacle-btn obstacle-decoy">Weiter zur Galerie</button>
-                <button type="button" id="obstacle-decoy-2" class="obstacle-btn obstacle-decoy">Hier klicken</button>
-                <button type="button" id="obstacle-trap" class="obstacle-btn obstacle-trap">NICHT klicken</button>
-                <button type="button" id="obstacle-real" class="obstacle-btn obstacle-real" disabled>weiter</button>
+                <button type="button" id="obstacle-decoy-1" class="obstacle-btn obstacle-decoy" data-sakuga="tap">Weiter zur Galerie</button>
+                <button type="button" id="obstacle-decoy-2" class="obstacle-btn obstacle-decoy" data-sakuga="tap">Hier klicken</button>
+                <button type="button" id="obstacle-trap" class="obstacle-btn obstacle-trap" data-sakuga="hit">NICHT klicken</button>
+                <button type="button" id="obstacle-real" class="obstacle-btn obstacle-real" data-sakuga="hit" disabled>weiter</button>
             </div>
 
             <p id="obstacle-message" class="obstacle-message" aria-live="polite"></p>
@@ -80,8 +80,8 @@
             <div class="gallery-tools">
                 <p class="air-meter gag-only">So viel Luft wurde heute bewegt: <strong id="air-value">4.711,3</strong> m³</p>
                 <div class="gallery-tool-buttons gag-only">
-                    <button type="button" id="unlock-btn" class="tool-btn">Exklusiven Inhalt freischalten</button>
-                    <button type="button" id="tip-btn" class="tool-btn">Trinkgeld geben</button>
+                    <button type="button" id="unlock-btn" class="tool-btn" data-sakuga="tap">Exklusiven Inhalt freischalten</button>
+                    <button type="button" id="tip-btn" class="tool-btn" data-sakuga="tap">Trinkgeld geben</button>
                 </div>
                 <div id="unlock-wrap" class="unlock-wrap gag-only" hidden>
                     <p id="unlock-label" class="unlock-label">Lade exklusiven Inhalt</p>
@@ -92,7 +92,7 @@
             </div>
 
             <div id="gallery-grid" class="gallery-grid"></div>
-            <button type="button" id="gallery-next" class="gallery-cta">Mehr sehen</button>
+            <button type="button" id="gallery-next" class="gallery-cta" data-sakuga="hit">Mehr sehen</button>
         </section>
 
         <!-- Stage 6: Abostufen -->
@@ -109,7 +109,7 @@
                         <li>Ein Lüfter pro Profil</li>
                         <li>Werbung von Radiatorherstellern</li>
                     </ul>
-                    <button type="button" class="tier-cta" data-tier="bronze">Für 0,00 Euro abonnieren</button>
+                    <button type="button" class="tier-cta" data-sakuga="hit" data-tier="bronze">Für 0,00 Euro abonnieren</button>
                 </article>
 
                 <article class="tier-card glass-panel tier-featured">
@@ -121,7 +121,7 @@
                         <li>Drehzahlkurven in voller Auflösung</li>
                         <li>Wöchentliches Staubfrei-Update</li>
                     </ul>
-                    <button type="button" class="tier-cta" data-tier="silber">Für 0,00 Euro abonnieren</button>
+                    <button type="button" class="tier-cta" data-sakuga="hit" data-tier="silber">Für 0,00 Euro abonnieren</button>
                 </article>
 
                 <article class="tier-card glass-panel">
@@ -131,7 +131,7 @@
                         <li>Dieselbe Luft wie Silber, aber mit RGB</li>
                         <li>Fühlt sich dadurch teurer an</li>
                     </ul>
-                    <button type="button" class="tier-cta" data-tier="gold">Für 0,00 Euro abonnieren</button>
+                    <button type="button" class="tier-cta" data-sakuga="hit" data-tier="gold">Für 0,00 Euro abonnieren</button>
                 </article>
             </div>
 
@@ -150,7 +150,7 @@
                     <a href="https://www.youtube.com/@mortyswelt" target="_blank" rel="noopener noreferrer">YouTube</a>
                     <a href="../">Alle Links</a>
                 </nav>
-                <button type="button" id="outro-restart">Nochmal von vorne</button>
+                <button type="button" id="outro-restart" data-sakuga="tap">Nochmal von vorne</button>
             </div>
         </section>
     </main>
@@ -164,5 +164,7 @@
 
     <script src="assets/fans.js"></script>
     <script src="assets/app.js"></script>
+<script src="../sakuga/sakuga-core.js"></script>
+<script src="../sakuga/mw-sakuga.js"></script>
 </body>
 </html>

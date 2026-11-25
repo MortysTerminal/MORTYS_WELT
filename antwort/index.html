@@ -134,7 +134,7 @@
   <div class="qcard" id="qcard" style="opacity:0;transform:translateY(14px);transition:.7s">
     <h1>Möchtest du <span class="sub2">Subnautica&nbsp;2</span><br>mit <span class="me">mir</span> spielen?</h1>
     <div class="btns">
-      <button id="ja">Ja</button>
+      <button id="ja" data-sakuga="hit">Ja</button>
       <button id="nein">Nein</button>
     </div>
     <div class="counter" id="counter"></div>
@@ -409,7 +409,7 @@ function errorDialog(){
     +'<p style="font-size:.9rem;line-height:1.55">⚠ Ein Problem hat dazu geführt, dass <b>Nein</b> nicht mehr korrekt funktioniert. '
     +'Windows sucht nach einer Lösung… gefunden wurde nur <b>Ja</b>.</p>'
     +'<div style="display:flex;justify-content:flex-end;margin-top:20px">'
-    +'<button id="dja" style="font-family:\'Inter\';font-weight:800;cursor:pointer;border:none;color:#202020;background:var(--gelb);padding:10px 22px;border-radius:9px">Trotzdem Ja</button>'
+    +'<button id="dja" data-sakuga="hit" style="font-family:\'Inter\';font-weight:800;cursor:pointer;border:none;color:#202020;background:var(--gelb);padding:10px 22px;border-radius:9px">Trotzdem Ja</button>'
     +'</div></div>';
   ov.appendChild(win); document.body.appendChild(ov);
   const close=()=>{ ov.remove(); dialogOpen=false; };
@@ -571,5 +571,7 @@ function loop(){
   if(parts.length) raf=requestAnimationFrame(loop); else {raf=null;ctx.clearRect(0,0,cv.width,cv.height);}
 }
 </script>
+<script src="../sakuga/sakuga-core.js"></script>
+<script src="../sakuga/mw-sakuga.js"></script>
 </body>
 </html>
